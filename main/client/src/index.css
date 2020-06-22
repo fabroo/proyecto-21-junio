@@ -1,0 +1,98 @@
+.loginn{
+    margin: 20vh auto 0 auto;
+}
+.swal-overlay {
+    background-color: #c8c8c898;
+  }
+  .swal-footer {
+    background-color: rgb(245, 248, 250);
+    margin-top: 32px;
+    border-top: 1px solid #E9EEF1;
+    overflow: hidden;
+  }
+  .swal-button--catch ,.swal-button--confirm {
+    background-color: #0069d9;
+    color: rgb(240, 240, 240);
+  }
+#team{
+    text-align: center;
+}
+.aver{
+    border-radius: 50%;
+}
+.arriba{
+    text-align: center;
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+}
+.span-logo{
+    margin: 1rem auto 1rem auto;
+}
+.contenedor-servicios{
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+    .fotoo{
+    width: 40%;
+    height: 40%;    
+    border-radius: 50% !important;
+
+    object-fit: cover;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
+  }
+  .btn-social{
+      margin: .5rem auto 2rem auto;
+  }
+.las-fotos{
+    width: 100%;
+    text-align: center;
+    margin: auto auto;
+}
+.las-fotos-adentro{
+    display: inline-block;
+}
+::-webkit-scrollbar {
+    width: 7px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+   
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #333; 
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+@media (max-width:400px){
+    #uwu{
+        text-align: center;
+        font-size: 20px;
+        margin-bottom: 1rem;
+    }
+    .input-login{
+        justify-content: center;
+        width: 200px;
+    }
+    
+    .row{
+        margin: auto auto;
+        text-align: center;
+        align-items: center;
+    }
+    .col-6{
+        max-width: 100%;
+        margin: .7rem auto;
+    }
+    .loginn{
+        margin: 10vh auto 0 auto;
+    }
+    
+}
