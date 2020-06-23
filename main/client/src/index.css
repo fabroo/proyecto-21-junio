@@ -1,6 +1,9 @@
 .loginn{
     margin: 20vh auto 0 auto;
 }
+.none{
+    display: none;
+}
 .swal-overlay {
     background-color: #c8c8c898;
   }

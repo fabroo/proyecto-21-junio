@@ -10,12 +10,14 @@ const Admin = props => {
     let [content, setContent] = useState(null)
     let [elinput, setElInput] = useState({ dni: 0, role: "user", username: "" })
 
+    let [registradoClass,setRegistradoClass] = useState({style:{display:'none',margin: 'auto .5rem'}})
+    let [noregistradoClass,setNoRegistradoClass] = useState({style:{display:'none',margin: 'auto .5rem'}})
+    let [add,setAdd] = useState({style:{display:'none',margin: 'auto .5rem'}})
+    let [load,setLoad] = useState({style:{display:'block',margin: 'auto .5rem'}})
 
-    let [add, setAdd] = useState({ style: { display: 'none' } })
-    // useEffect(() => {
-    //     showData();
-    // })
+
     const showData = (e) => {
+       
         AuthService.getData(user.companyID).then(res => {
             setContent(res.data.sort(function (a, b) {
                 if (a.username < b.username) { return -1; }
@@ -27,6 +29,12 @@ const Admin = props => {
         }, [])
     }
     const showRegister = (e) => {
+        setLoad({display:'none'})
+        setAdd({display:"none"})
+
+        setRegistradoClass({display:'none'})
+        setNoRegistradoClass({display:'block'})
+
         console.log('http://'+ String(process.env.LA_IP) + ':5000/user/register');
         AuthService.getData(user.companyID).then(res => {
             const all = res.data;
@@ -46,6 +54,9 @@ const Admin = props => {
         }, [])
     }
     const showUnRegister = (e) => {
+        setRegistradoClass({display:'block'})
+        setAdd({display:"block"})
+        setNoRegistradoClass({display:'none'})
         AuthService.getData(user.companyID).then(res => {
             const all = res.data;
             const users = [];
@@ -84,13 +95,7 @@ const Admin = props => {
                     case "borrar":
                         swal("Eliminado", "El trabajador no forma mas parte de la empresa", "success");
                         AuthService.removeUser(dni).then(res => {
-                            AuthService.getData(user.companyID).then(res => {
-                                setContent(res.data.sort(function (a, b) {
-                                    if (a.username < b.username) { return -1; }
-                                    if (a.username > b.username) { return 1; }
-                                    return 0;
-                                }));
-                            }, [])
+                           showRegister()
                         }, [])
                         break;
 
@@ -108,7 +113,7 @@ const Admin = props => {
             console.log(res)
         }, [])
 
-       showUnRegister(  )
+       showUnRegister()
 
     }
     const handleChange = (e) => {
@@ -118,12 +123,14 @@ const Admin = props => {
     return (
 
         <div className="container" >
-            <div className="arriba">
-                <h3 className="m-4" >Código: "{user.companyID}"</h3>
-                <div className="botonera" >
-                    <button style={{ margin: 'auto .5rem' }} className="btn btn-primary" onClick={showRegister}>REGISTRADOS</button>
-                    <button style={{ margin: 'auto .5rem' }} className="btn btn-secondary" onClick={showUnRegister}>NO REGISTRADOS</button>
-                    <button type="button" className="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
+            <h1 class="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
+
+            <div className="arriba d-flex flex-row-reverse">
+                <div className="botonera" style={{display:'flex'}} >
+                    <button style={load} className="btn  btn-warning m-2" onClick={showRegister}>LOAD..</button>
+                    <button className="btn btn-primary m-2 none"style={registradoClass}  onClick={showRegister}>REGISTRADOS</button>
+                    <button  className="btn btn-secondary m-2 none"style={noregistradoClass} onClick={showUnRegister}>NO REGISTRADOS</button>
+                    <button style={add} type="button" className="btn btn-info m-2 none" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
 
                 </div>
                 {/* <button className="btn btn-info">+</button> */}
