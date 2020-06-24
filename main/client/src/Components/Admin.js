@@ -161,7 +161,7 @@ const Admin = props => {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-dismiss="modal">Close</button>
-                                <button type="button" className="btn btn-primary" onClick={() => registrarNuevo()}>Create</button>
+                                <button type="button" className="btn btn-primary" data-dismiss="modal" onClick={() => registrarNuevo()}>Create</button>
                             </div>
                         </div>
                     </div>
@@ -172,13 +172,13 @@ const Admin = props => {
                 <table className="table table-hover text-center table-responsive-lg">
                     <thead className="thead-dark">
                         <tr>
-                            <th className="">username</th>
-                            <th className="">dni</th>
-                            <th className="">companyID</th>
-                            <th className="">mail</th>
-                            <th className="">modelo entrendado</th>
-                            <th className="">role</th>
-                            <th>bye</th>
+                            <th className="">Nombre</th>
+                            <th className="">DNI</th>
+                            <th className="">Compañía</th>
+                            <th className="">E-Mail</th>
+                            <th className="">Modelo Entrenado?</th>
+                            <th className="">Rol</th>
+                            <th>Eliminar</th>
                         </tr>
                     </thead>
                     <tbody>
