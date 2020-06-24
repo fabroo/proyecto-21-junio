@@ -1,5 +1,5 @@
 import axios from 'axios'
-const ip = "192.168.1.203"
+const ip = "192.168.0.109"
 
 export default {
     login : user =>{
@@ -33,6 +33,11 @@ export default {
     getData : async (companyid)=>{
         //cambiar con la ip de tu casa
         return await axios.get('http://'+ ip + ':5000/user/users/'+ companyid)
+        .then(res => res)
+        
+    },
+    upload: async (data, user) =>{
+        return await axios.post('http://'+ ip + ':5000/user/upload',data )
         .then(res => res)
         
     },

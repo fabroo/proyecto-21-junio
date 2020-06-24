@@ -6,6 +6,11 @@ const JWT = require('jsonwebtoken');
 const UserNew = require('../models/User');
 const Todo = require('../models/Todo');
 const User = require('../models/User');
+const multer = require('multer');
+const fs = require('fs');
+const { CLIENT_RENEG_LIMIT } = require('tls');
+
+
 
 
 
@@ -94,6 +99,67 @@ userRouter.post('/login', passport.authenticate('local', { session: false }), (r
 userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.clearCookie('access_token');
     res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "" }, success: true });
+});
+
+userRouter.post('/upload', async function (req, res) {
+
+
+    var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+
+            const direccion = 'fotitos owo/' + req.body.username;
+            console.log(direccion)
+            var cr = false;
+            if (!fs.existsSync(direccion)) {
+                fs.mkdir(direccion, err => {
+                    if (err) {
+                        console.log(err)
+                    }
+                })
+                cr = true;
+            }
+            else {
+                cr = true;
+            }
+            if (cr) {
+                cb(null, direccion)
+            }
+
+        },
+        filename: function (req, file, cb) {
+            console.log(req.body.username)
+            var extArr = file.originalname;
+            let extensiones = ['.jpg', '.jpeg', '.png'];
+            var extension = '';
+            for (let i = 0; i < extensiones.length; i++) {
+
+                if (extArr.includes(extensiones[i])) {
+                    extension = extensiones[i]
+                }
+            }
+            cb(null, req.body.username + '-' + Date.now() + '.' + extension)
+        }
+
+
+
+    })
+    var upload = multer({ storage: storage }).array('file')
+
+
+
+    console.log("si.")
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(500).json(err)
+        } else if (err) {
+            return res.status(500).json(err)
+        }
+
+        return res.status(200).send(req.file)
+
+    })
+    console.log("sapeee")
+
 });
 
 userRouter.post('/todo', passport.authenticate('jwt', { session: false }), (req, res) => {

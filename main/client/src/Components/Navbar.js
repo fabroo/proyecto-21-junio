@@ -63,6 +63,11 @@ const Navbar = props =>{
                         onClick={onClickLogoutHandler}><li className=" nav-link">
                         Logout
                     </li></Link>
+                <Link className=" nav-item " to="/upload">
+                    <li className=" nav-link">
+                        Upload
+                    </li>
+                </Link>
             </>
         )
     }

@@ -4,6 +4,7 @@ import Footer from './Components/footer'
 import Login from './Components/Login';
 import Home from './Components/Home';
 import Todos from './Components/Todos';
+import Upload from './Components/Upload';
 import Register from './Components/Register';
 import Admin  from './Components/Admin';
 import PrivateRoute from './hocs/PrivateRoute';
@@ -20,6 +21,7 @@ function App() {
       <UnPrivateRoute path="/register" component={Register}/>
       <PrivateRoute path="/todos" roles={["user","admin"]} component={Todos}/>
       <PrivateRoute path="/admin" roles={["admin"]} component={Admin}/>
+      <PrivateRoute path="/upload" roles={["user","admin"]} component={Upload}/>
       
       <Footer/>
     </Router>
