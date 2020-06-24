@@ -1,5 +1,5 @@
 import axios from 'axios'
-const ip = "192.168.0.109"
+const ip = "192.168.1.203"
 
 export default {
     login : user =>{
@@ -44,6 +44,21 @@ export default {
     removeUser : async (id)=>{
         //cambiar con la ip de tu casa
         return await axios.get('http://'+ ip + ':5000/user/delete/'+ id)
+        .then(res => res)
+        
+    },
+    getFotos : async (dni)=>{
+        return await axios.get('http://'+ ip + ':5000/user/getFotos/'+ dni)
+        .then(res => res)
+        
+    },
+    wipeFotos : async (dni,companyid)=>{
+        return await axios.post('http://'+ ip + ':5000/user/wipeFotos/'+ dni,{companyid})
+        .then(res => res)
+        
+    },
+    addFotos : async (dni,cantidad)=>{
+        return await axios.post('http://'+ ip + ':5000/user/addFotos/'+ dni,cantidad)
         .then(res => res)
         
     },

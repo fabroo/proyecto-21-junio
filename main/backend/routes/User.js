@@ -8,10 +8,7 @@ const Todo = require('../models/Todo');
 const User = require('../models/User');
 const multer = require('multer');
 const fs = require('fs');
-const { CLIENT_RENEG_LIMIT } = require('tls');
-
-
-
+const Path = require('path');
 
 
 userRouter.get('/tool', async (req, res) => {
@@ -52,6 +49,60 @@ userRouter.get('/delete/:_id', async (req, res) => {
     res.json(users)
 })
 
+userRouter.get('/getFotos/:dni', async (req, res) => {
+    const dni = req.params.dni;
+    const users = await UserNew.findOne({ "dni": dni })
+    res.json({ cantidad: users.cantidadFotos })
+})
+userRouter.post('/wipeFotos/:dni', async (req, res) => {
+    const dni = req.params.dni;
+    const companyid = req.body.companyid
+    let path = 'fotitos owo/' +companyid+'/'+dni
+    console.log(req.body)
+    const deleteFolderRecursive = async function(path) {
+        if (fs.existsSync(path)) {
+            
+          fs.readdirSync(path).forEach((file, index) => {
+            
+            const curPath = Path.join(path, file);
+            
+            if (fs.lstatSync(curPath).isDirectory()) { // recurse
+              deleteFolderRecursive(curPath);
+            } else { // delete file
+              fs.unlinkSync(curPath);
+            }
+          });
+          await UserNew.findOne({ dni: dni }, function (err, doc) {
+            if (err) return false;
+    
+            doc.cantidadFotos = 0;
+            doc.save()
+    
+        })
+          res.json({message:'todo ok', messageError: false})
+
+          fs.rmdirSync(path);
+        } else {
+            res.json({message:'ENOENT no existe eso', messageError: true})
+        }
+      };
+    deleteFolderRecursive(path);
+})
+
+userRouter.post('/addFotos/:dni', async (req, res) => {
+    const dni = req.params.dni;
+    const users = await UserNew.findOne({ "dni": dni })
+    await UserNew.findOne({ dni: dni }, function (err, doc) {
+        if (err) return false;
+
+        doc.cantidadFotos += req.body.cantidad;
+        doc.save()
+
+    })
+    res.json({ message: { msgBody: "todo ok", msgError: false } })
+
+})
+
 
 
 const signToken = userID => {
@@ -86,11 +137,11 @@ userRouter.put('/register', async (req, res) => {
 
 userRouter.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
     if (req.isAuthenticated()) {
-        const { _id, username, role, dni, companyID, mail } = req.user;
+        const { _id, username, role, dni, companyID, mail, cantidadFotos } = req.user;
         const token = signToken(_id);
 
         res.cookie('access_token', token, { httpOnly: true, sameSite: true });
-        res.status(200).json({ isAuthenticated: true, user: { username, role, dni, companyID, mail } });
+        res.status(200).json({ isAuthenticated: true, user: { username, role, dni, companyID, mail, cantidadFotos } });
 
     }
 
@@ -98,20 +149,19 @@ userRouter.post('/login', passport.authenticate('local', { session: false }), (r
 
 userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.clearCookie('access_token');
-    res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "" }, success: true });
+    res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "", cantidadFotos: 0 }, success: true });
 });
 
 userRouter.post('/upload', async function (req, res) {
 
-
     var storage = multer.diskStorage({
         destination: function (req, file, cb) {
-
-            const direccion = 'fotitos owo/' + req.body.username;
-            console.log(direccion)
+            const direccion1 = 'fotitos owo/' + req.body.companyID;
+            const direccion2 = 'fotitos owo/' + req.body.companyID + '/' + req.body.username;
             var cr = false;
-            if (!fs.existsSync(direccion)) {
-                fs.mkdir(direccion, err => {
+            var cro = false;
+            if (!fs.existsSync(direccion1)) {
+                fs.mkdir(direccion1, err => {
                     if (err) {
                         console.log(err)
                     }
@@ -120,9 +170,24 @@ userRouter.post('/upload', async function (req, res) {
             }
             else {
                 cr = true;
+
             }
+
             if (cr) {
-                cb(null, direccion)
+                if (!fs.existsSync(direccion2)) {
+                    fs.mkdir(direccion2, err => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    cro = true;
+                }
+                else {
+                    cro = true;
+                }
+                if (cro) {
+                    cb(null, direccion2)
+                }
             }
 
         },
@@ -198,8 +263,8 @@ userRouter.get('/admin', passport.authenticate('jwt', { session: false }), (req,
 });
 
 userRouter.get('/authenticated', passport.authenticate('jwt', { session: false }), (req, res) => {
-    const { username, role, dni, companyID, mail } = req.user;
-    res.status(200).json({ isAuthenticated: true, user: { username, role, dni, modeloEntrenado: false, companyID, mail } });
+    const { username, role, dni, companyID, mail, cantidadFotos } = req.user;
+    res.status(200).json({ isAuthenticated: true, user: { username, role, dni, modeloEntrenado: false, companyID, mail, cantidadFotos } });
 });
 
 

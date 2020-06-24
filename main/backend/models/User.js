@@ -31,6 +31,10 @@ const UserSchema = new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    cantidadFotos:{
+        type:Number,
+        default:0
+    },
    
     todos : [{type : mongoose.Schema.Types.ObjectId, ref: 'Todo'}]
 });
