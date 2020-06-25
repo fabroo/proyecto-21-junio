@@ -3,6 +3,8 @@ const app = express();
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const path = require('path');
+app.use(express.static(path.join(__dirname, 'client/build')))
 
 app.use(cookieParser());
 app.use(express.json());
