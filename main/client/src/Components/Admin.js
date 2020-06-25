@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState } from 'react'
 import { AuthContext } from '../Context/AuthContext';
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
@@ -16,7 +16,7 @@ const Admin = props => {
     let [load, setLoad] = useState({ style: { display: 'block', margin: 'auto .5rem' } })
 
 
-    const showData = (e) => {
+    const showData = () => {
 
         AuthService.getData(user.companyID).then(res => {
             setContent(res.data.sort(function (a, b) {
@@ -119,10 +119,10 @@ const Admin = props => {
     const handleChange = (e) => {
         setElInput({ ...elinput, [e.target.name]: e.target.value });
     }
-    const wipeFotos = async (user) =>{
+    const wipeFotos = async (user) => {
         let dni = user.dni
-        let  companyID = user.companyID
-        if(user.cantidadFotos > 0 && user.createdAccount){
+        let companyID = user.companyID
+        if (user.cantidadFotos > 0 && user.createdAccount) {
             swal("Estas seguro de ello? No podras volver atrás", {
                 buttons: {
                     cancel: "Cancelar",
@@ -132,24 +132,24 @@ const Admin = props => {
                     }
                 },
             })
-                .then( async (value) => {
+                .then(async (value) => {
                     switch (value) {
-    
+
                         case "borrar":
                             swal("Eliminado", "Imagenes eliminadas", "success");
-                            await AuthService.wipeFotos(dni,companyID).then(res =>{
+                            await AuthService.wipeFotos(dni, companyID).then(res => {
                                 console.log(res)
                             })
                             AuthService.getData(user.companyID).then(res => {
                                 const all = res.data;
                                 const users = [];
-                    
+
                                 all.map(user => {
                                     if (user.createdAccount) {
                                         users.push(user)
                                     }
                                 })
-                    
+
                                 setContent(users.sort(function (a, b) {
                                     if (a.username < b.username) { return -1; }
                                     if (a.username > b.username) { return 1; }
@@ -157,13 +157,13 @@ const Admin = props => {
                                 }));
                             }, [])
                             break;
-    
+
                         default:
-    
+
                     }
                 });
-            
-        }else{
+
+        } else {
             swal({
                 icon: 'error',
                 title: 'Oops...',
@@ -171,13 +171,10 @@ const Admin = props => {
                 footer: 'Volve a intentar'
             })
         }
-        
-        
     }
     return (
-
         <div className="container" >
-            <h1 class="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
+            <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
 
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
@@ -246,7 +243,7 @@ const Admin = props => {
                                     <td><p>{user.companyID}</p></td>
                                     <td><p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p></td>
                                     <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                    <td><p onClick = {() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
+                                    <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
                                     <td><p>{user.role}</p></td>
                                     <td> {user.role !== "admin" ? (<button className="btn btn-danger" onClick={() => chau(user._id)}>X</button>) : (<p>es admin bro</p>)} </td>
                                 </tr>)
