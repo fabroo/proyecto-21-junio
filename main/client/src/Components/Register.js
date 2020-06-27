@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import AuthService from '../Services/AuthService';
-import {Link} from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import Message from '../Components/Message';
+import swal from 'sweetalert';
 
 const Register = props => {
     const [user, setUser] = useState({ username: "", password: "", dni: "", companyID: "", mail: "" });
     const [message, setMessage] = useState(null);
+    const [picture, setPicture] = useState(null);
+    const [fotos, setFotos] = useState({ cantidad: 0 })
     let timerID = useRef(null);
 
     useEffect(() => {
@@ -14,6 +17,39 @@ const Register = props => {
         }
     }, []);
 
+    const onChangeHandler = (e) => {
+
+        setPicture(e.target.files)
+        setFotos({ cantidad: e.target.files.length })
+
+    }
+    const onClickHandler = () => {
+
+        AuthService.getFotos(user.dni).then(res => {
+            const data = new FormData()
+            data.append('username', user.dni)
+            data.append('companyID', user.companyID)
+            for (var x = 0; x < picture.length; x++) {
+                let extensiones = ['.jpg', '.jpeg', '.png'];
+                for (let i = 0; i < extensiones.length; i++) {
+                    if (picture[x].name.includes(extensiones[i])) {
+                        data.append('file', picture[x])
+                    }
+                }
+            }
+            AuthService.uploadPfp(data, user.username)
+            swal({
+                icon: 'success',
+                title: 'Nice',
+                text: "fotos subidas"
+            })
+            timerID = setTimeout(() => {
+                props.history.push('/todos');
+            }, 3000)
+
+        })
+
+    }
     const onChange = e => {
         setUser({ ...user, [e.target.name]: e.target.value });
     }
@@ -24,24 +60,26 @@ const Register = props => {
 
     const onSubmit = e => {
         e.preventDefault();
-        console.log('user: '+JSON.stringify(user))
+        console.log('user: ' + JSON.stringify(user))
 
         AuthService.register(user).then(data => {
             const { message } = data.data;
             setMessage(message);
             resetForm();
             if (!message.msgError) {
+                onClickHandler()
                 timerID = setTimeout(() => {
                     props.history.push('/login');
                 }, 2000)
             }
         });
+
     }
 
 
 
     return (
-        <div className="container "style={{margin:'20vh auto auto auto'}}>
+        <div className="container " style={{ margin: '20vh auto auto auto' }}>
             <form onSubmit={onSubmit}>
                 <h3>Please Register</h3>
                 <label htmlFor="username" className="sr-only">Username: </label>
@@ -61,7 +99,7 @@ const Register = props => {
                             className="form-control m-2"
                             placeholder="Enter Password" />
                     </div>
-                    
+
                 </div>
                 <label htmlFor="mail" className="sr-only">mail: </label>
                 <input type="text"
@@ -90,17 +128,22 @@ const Register = props => {
                             placeholder="Enter company Id " />
 
                     </div>
+                    <div className="col-md-6">
+                        <input type="file" onChange={onChangeHandler} name="holu" className="custom-file-input" id="customFile" accept="image/png, image/jpeg,image/jpg" />
+                        <label className="custom-file-label" htmlFor="customFile">Choose file</label>
+                    </div>
+
                 </div>
 
                 <button className="btn  btn-primary m-2 row"
                     type="submit">Register</button>
-<div className="d-flex justify-content-end">
-<p className="">Ya tenes cuenta? <Link to="/login">Inicia Sesion</Link></p>
+                <div className="d-flex justify-content-end">
+                    <p className="">Ya tenes cuenta? <Link to="/login">Inicia Sesion</Link></p>
 
-</div>
+                </div>
             </form>
             {message ? <Message message={message} /> : null}
-            <br/>
+            <br />
         </div>
     )
 }

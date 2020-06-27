@@ -3,7 +3,6 @@ import { AuthContext } from '../Context/AuthContext';
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
 
-
 const Admin = props => {
 
     const { user } = useContext(AuthContext);
@@ -228,8 +227,9 @@ const Admin = props => {
                             <th className="">Compañía</th>
                             <th className="">E-Mail</th>
                             <th className="">Modelo Entrenado?</th>
-                            <th className="">Cantidad de Fotos</th>
+                            <th className="">Profile Picture</th>
                             <th className="">Rol</th>
+                            <th className="">Cantidad de Fotos</th>
                             <th>Eliminar</th>
                         </tr>
                     </thead>
@@ -241,10 +241,13 @@ const Admin = props => {
                                     <td>{user.username == user.dni ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
                                     <td ><p>{user.dni}</p></td>
                                     <td><p>{user.companyID}</p></td>
-                                    <td><p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p></td>
+                                    <td><p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.museail}</a></p></td>
                                     <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                    <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
+                                    <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt="" /> : (<p>no hay :(</p>)}</td>
+
                                     <td><p>{user.role}</p></td>
+                                    <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
+
                                     <td> {user.role !== "admin" ? (<button className="btn btn-danger" onClick={() => chau(user._id)}>X</button>) : (<p>es admin bro</p>)} </td>
                                 </tr>)
 

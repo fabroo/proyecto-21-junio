@@ -1,7 +1,9 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 import AuthService from '../Services/AuthService';
 import { AuthContext } from '../Context/AuthContext';
 import swal from 'sweetalert';
+import axios from 'axios'
+
 
 const Upload = props => {
     const [picture, setPicture] = useState(null);
@@ -9,8 +11,8 @@ const Upload = props => {
     const [style, setStyle] = useState({ display: { width: '0%' } })
     const [porcentaje, setPorcentaje] = useState({ porcentaje: '0%' })
     const [fotos, setFotos] = useState({ cantidad: 0 })
-
     let timerID = useRef(null);
+
 
     const onChangeHandler = (e) => {
 
@@ -19,6 +21,7 @@ const Upload = props => {
         setFotos({ cantidad: e.target.files.length })
 
     }
+
 
     const onClickHandler = () => {
         if (fotos.cantidad > 0) {
@@ -95,6 +98,7 @@ const Upload = props => {
             <br /><br /><br />
             <div className="container">
             </div>
+            <br /><br />
         </div>
     )
 }

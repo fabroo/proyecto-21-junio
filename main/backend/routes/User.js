@@ -15,6 +15,12 @@ userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     res.json(users)
 })
+userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
+    var companyid = req.params.companyid;
+    var dni = req.params.dni;
+    //    res.sendFile('\\users\\' + companyid + '\\' + dni + '.jpg', { root: '.' })
+    res.sendFile('\\users\\' + companyid + '\\' + dni + '\\' + dni + '.jpg', { root: '.' })
+})
 
 userRouter.post('/registerNew', (req, res) => {
     const { dni, companyID, role, username } = req.body;
@@ -28,8 +34,6 @@ userRouter.post('/registerNew', (req, res) => {
             newUser.save(err => {
                 if (err) {
                     res.status(500).json({ message: { msgBody: "Error has occured", msgError: true } });
-                    console.log(err)
-                    console.log('uwu')
                 }
                 else
                     res.status(201).json({ message: { msgBody: "Account successfully created", msgError: false } });
@@ -57,35 +61,34 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const companyid = req.body.companyid
-    let path = 'fotitos owo/' +companyid+'/'+dni
-    console.log(req.body)
-    const deleteFolderRecursive = async function(path) {
+    let path = 'fotitos owo/' + companyid + '/' + dni
+    const deleteFolderRecursive = async function (path) {
         if (fs.existsSync(path)) {
-            
-          fs.readdirSync(path).forEach((file, index) => {
-            
-            const curPath = Path.join(path, file);
-            
-            if (fs.lstatSync(curPath).isDirectory()) { // recurse
-              deleteFolderRecursive(curPath);
-            } else { // delete file
-              fs.unlinkSync(curPath);
-            }
-          });
-          await UserNew.findOne({ dni: dni }, function (err, doc) {
-            if (err) return false;
-    
-            doc.cantidadFotos = 0;
-            doc.save()
-    
-        })
-          res.json({message:'todo ok', messageError: false})
 
-          fs.rmdirSync(path);
+            fs.readdirSync(path).forEach((file, index) => {
+
+                const curPath = Path.join(path, file);
+
+                if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                    deleteFolderRecursive(curPath);
+                } else { // delete file
+                    fs.unlinkSync(curPath);
+                }
+            });
+            await UserNew.findOne({ dni: dni }, function (err, doc) {
+                if (err) return false;
+
+                doc.cantidadFotos = 0;
+                doc.save()
+
+            })
+            res.json({ message: 'todo ok', messageError: false })
+
+            fs.rmdirSync(path);
         } else {
-            res.json({message:'ENOENT no existe eso', messageError: true})
+            res.json({ message: 'ENOENT no existe eso', messageError: true })
         }
-      };
+    };
     deleteFolderRecursive(path);
 })
 
@@ -192,7 +195,6 @@ userRouter.post('/upload', async function (req, res) {
 
         },
         filename: function (req, file, cb) {
-            console.log(req.body.username)
             var extArr = file.originalname;
             let extensiones = ['.jpg', '.jpeg', '.png'];
             var extension = '';
@@ -211,8 +213,6 @@ userRouter.post('/upload', async function (req, res) {
     var upload = multer({ storage: storage }).array('file')
 
 
-
-    console.log("si.")
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
             return res.status(500).json(err)
@@ -223,8 +223,66 @@ userRouter.post('/upload', async function (req, res) {
         return res.status(200).send(req.file)
 
     })
-    console.log("sapeee")
+});
+userRouter.post('/uploadPfp', async function (req, res) {
 
+    var storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+            const direccion1 = 'users/' + req.body.companyID;
+            const direccion2 = 'users/' + req.body.companyID + '/' + req.body.username;
+            var cr = false;
+            var cro = false;
+            if (!fs.existsSync(direccion1)) {
+                fs.mkdir(direccion1, err => {
+                    if (err) {
+                        console.log(err)
+                    }
+                })
+                cr = true;
+            }
+            else {
+                cr = true;
+            }
+            if (cr) {
+                if (!fs.existsSync(direccion2)) {
+                    fs.mkdir(direccion2, err => {
+                        if (err) {
+                            console.log(err)
+                        }
+                    })
+                    cro = true;
+                }
+                else {
+                    cro = true;
+                }
+                if (cro) {
+                    cb(null, direccion2)
+                }
+            }
+        },
+        filename: function (req, file, cb) {
+            var extArr = file.originalname;
+            let extensiones = ['.jpg', '.jpeg', '.png'];
+            var extension = '';
+            for (let i = 0; i < extensiones.length; i++) {
+                if (extArr.includes(extensiones[i])) {
+                    extension = extensiones[i]
+                }
+            }
+            cb(null, req.body.username + extension)
+        }
+    })
+    var upload = multer({ storage: storage }).array('file')
+    upload(req, res, function (err) {
+        if (err instanceof multer.MulterError) {
+            return res.status(500).json(err)
+        } else if (err) {
+            return res.status(500).json(err)
+        }
+
+        return res.status(200).send(req.file)
+
+    })
 });
 
 userRouter.post('/todo', passport.authenticate('jwt', { session: false }), (req, res) => {
