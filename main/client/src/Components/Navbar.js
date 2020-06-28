@@ -40,35 +40,40 @@ const Navbar = props => {
     const authenticatedNavBar = () => {
         return (
             <>
-                <Link to="/" className="nav-item">
-                    <li className=" nav-link">
-                        Home
+
+{user ? (<div className="hola-usuario " style={{marginRight:'1rem', display: 'flex', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
+                <img className="img-fluid" style={{ width: '40px', borderRadius: '50%' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt="" />
+                <p style ={{marginLeft:'.5rem',padding:0,marginBottom:0}}>{user.username}</p>
+            </div>) : (null)}
+                    <Link to="/" className="nav-item">
+                        <li className=" nav-link">
+                            Home
                     </li>
-                </Link>
-                <Link to="/todos" className="nav-item">
-                    <li className=" nav-link">
-                        Todos
+                    </Link>
+                    <Link to="/todos" className="nav-item">
+                        <li className=" nav-link">
+                            Todos
                     </li>
-                </Link>
-                {
-                    user.role === "admin" ?
-                        <Link to="/admin" className="nav-item">
-                            <li className=" nav-link">
-                                Admin
+                    </Link>
+                    {
+                        user.role === "admin" ?
+                            <Link to="/admin" className="nav-item">
+                                <li className=" nav-link">
+                                    Admin
                         </li>
-                        </Link> : null
-                }
-                <Link className=" nav-item " to="/upload">
-                    <li className=" nav-link">
-                        Upload
+                            </Link> : null
+                    }
+                    <Link className=" nav-item " to="/upload">
+                        <li className=" nav-link">
+                            Upload
                     </li>
-                </Link>
-                <Link type="button"
-                    className=" nav-item " to="/"
-                    onClick={onClickLogoutHandler}><li className=" nav-link">
-                        Logout
+                    </Link>
+                    <Link type="button"
+                        className=" nav-item " to="/"
+                        onClick={onClickLogoutHandler}><li className=" nav-link">
+                            Logout
                     </li>
-                </Link>
+                    </Link>
 
             </>
         )
@@ -78,15 +83,17 @@ const Navbar = props => {
             <Link to="/" className="nav-item">
                 <div className="navbar-brand">Leo Mattioli</div>
             </Link>
-            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span className="navbar-toggler-icon"></span>
-            </button>
 
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul className="navbar-nav mr-auto">
                     {!isAuthenticated ? unauthenticatedNavBar() : authenticatedNavBar()}
                 </ul>
             </div>
+            
+            <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span className="navbar-toggler-icon"></span>
+            </button>
+
         </nav>
     )
 }
