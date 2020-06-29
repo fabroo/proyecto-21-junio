@@ -23,7 +23,7 @@ function App() {
       <PrivateRoute path="/admin" roles={["admin"]} component={Admin}/>
       <PrivateRoute path="/upload" roles={["user","admin"]} component={Upload}/>
       
-      <Footer/>
+      {/* <Footer/> */}
     </Router>
     
 

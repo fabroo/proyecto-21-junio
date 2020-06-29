@@ -6,7 +6,7 @@ import Message from '../Components/Message';
 const Python = props=>{
     const [user,setLink] = useState({link:""});
     const [url,setUrl] = useState({url:""});
-    const [setMessage] = useState(null);
+    const [message,setMessage] = useState(null);
 
 
     const onChange = e =>{
@@ -18,8 +18,10 @@ const Python = props=>{
     const onSubmit = e =>{
         e.preventDefault();
         AuthService.postPython(user).then(data=>{
+            console.log(data)
             setUrl({url:((data).data.message)})
-            setMessage({message:"el link es: "+(data).data.message})
+            let yes = ((data).data.message)
+            setMessage({msgBody:"el link es: "+ yes})
             resetForm();
             
         });
@@ -34,7 +36,8 @@ const Python = props=>{
                        
                 <button className="btn  btn-primary m-2" type="submit">Convertir</button>
             </form>
-            { url.url ? <Message message={ url.url}/> : null}
+            {message ? <Message message={message}/> : null}
+
         </div>
     )
 }
