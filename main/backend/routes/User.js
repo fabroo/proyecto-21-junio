@@ -222,9 +222,10 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         console.log('durante')
         resultadoCheck.push(data);
     });
-    await python.stdout.on('close', code => {
+    await python.stdout.on('close',async code => {
         console.log('despues')
         let yes = (resultadoCheck.join(""))
+       
         if (yes.includes(String(req.params.dni))) {
 
             console.log('el usuario esta')
