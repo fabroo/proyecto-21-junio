@@ -10,8 +10,8 @@ try:
     known_faces = []
     known_names = []
     dir_error = './error/'
-
     companyid = sys.argv[2]
+    dir_known = './known/' + companyid
 
     START = time.time() #the code starts here
 
@@ -25,6 +25,7 @@ try:
                 encoding = face_recognition.face_encodings(image)[0] # Get 128-dimension face encoding, Always returns a list of found faces, for this purpose we take first face only.
                 known_faces.append(encoding) # Append encodings and name
                 known_names.append(name)
+                shutil.move(f'{KNOWN_FACES_DIR}/{name}/{filename}',f'{dir_known}/{name}')
             except:
                 if not os.path.exists(f'{dir_error}/{name}'):
                     os.makedirs(f'{dir_error}/{name}')

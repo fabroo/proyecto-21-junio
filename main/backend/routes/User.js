@@ -216,7 +216,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         }
     })
     var resultadoCheck = [];
-    const python = spawn('python', ['check.py', req.params.companyid]);
+    var python = spawn('python', ['check.py', req.params.companyid]);
     console.log('antes')
     await python.stdout.on('data', (data) => {
         console.log('durante')
@@ -227,30 +227,41 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         let yes = (resultadoCheck.join(""))
        
         if (yes.includes(String(req.params.dni))) {
-
-            console.log('el usuario esta')
-
-            python = spawn('python', ['train-pero-bien.py', req.params.companyid]);
-
+            var largeDataSet = [];
+            console.log("addnewPics")
+            python = spawn('python', ['addExtraPics.py', req.params.dni, req.params.companyid])
             await python.stdout.on('data', (data) => {
-
+                console.log('adentro funco add pics')
                 largeDataSet.push(data);
                 res.json({ message: largeDataSet.join("") })
 
             });
         }
         else {
-            var largeDataSet = [];
-            python = spawn('python', ['train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
-            console.log('en el medio')
-            await python.stdout.on('data', (data) => {
-                console.log('adentro')
-                largeDataSet.push(data);
-                res.json({ message: largeDataSet.join("") })
-            });
-            await python.stdout.on('close', (code) => {
-                console.log('final')
-            });
+            if(fs.existsSync('./pickles/'+req.params.companyid+'/known_names')){
+                var largeDataSet = [];
+                console.log('train bien')
+                python = spawn('python', ['train-pero-bien.py', req.params.companyid]);
+
+                await python.stdout.on('data', (data) => {
+                    console.log('adentro funco train bien')
+                    largeDataSet.push(data);
+                    res.json({ message: largeDataSet.join("") })
+
+                });
+            }else{
+                var largeDataSet = [];
+                python = spawn('python', ['train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
+                console.log('en el medio // train lento')
+                await python.stdout.on('data', (data) => {
+                    console.log('adentro funco train lento')
+                    largeDataSet.push(data);
+                    res.json({ message: largeDataSet.join("") })
+                });
+                await python.stdout.on('close', (code) => {
+                    console.log('final')
+                });
+            }
         }
     })
 

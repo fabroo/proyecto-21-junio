@@ -39,7 +39,7 @@ try:
 
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{dir_error}/{name}/{filename}')
                 
-        dir_done = f'./users/{company}'
+        dir_done = f'./known/{company}'
         shutil.move(f'{NEW_FACES}/{name}',f'{dir_done}/{name}')
 
     arrayPrevio_names = np.array(known_names)
