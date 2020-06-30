@@ -3,12 +3,11 @@ const router = Router();
 const {spawn} = require('child_process');
 
 
-router.route('/train-old/:companyid')
+router.route('/tool')
 .get(async (req,res) =>{
-	var company = req.params.companyid;
 	var largeDataSet = [];
     
-	const python = spawn('python', ['train-bien.py', './fotitos/' + company + '/']);
+	const python = spawn('python', ['train-pero-bien.py','1a2b2b']);
 	
 	await python.stdout.on('data',  (data) => {
 		

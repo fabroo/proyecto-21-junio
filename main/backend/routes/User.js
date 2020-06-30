@@ -9,14 +9,14 @@ const User = require('../models/User');
 const multer = require('multer');
 const fs = require('fs');
 const Path = require('path');
-const {spawn} = require('child_process');
+const { spawn } = require('child_process');
 
 
 
 userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     res.json(users)
-    
+
 })
 userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
     var companyid = req.params.companyid;
@@ -158,7 +158,7 @@ userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req
     res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "", cantidadFotos: 0 }, success: true });
 });
 
-userRouter.post('/upload/:companyid', async function (req, res) {
+userRouter.post('/upload/:companyid/:dni', async function (req, res) {
     var storage = multer.diskStorage({
 
         destination: function (req, file, cb) {
@@ -214,19 +214,44 @@ userRouter.post('/upload/:companyid', async function (req, res) {
         } else if (err) {
             return res.status(500).json(err)
         }
-        // return res.status(200).send(req.file)
     })
-    var largeDataSet = [];
-    const python = spawn('python', ['train-bien.py', './fotitos/' + req.params.companyid ,req.params.companyid]);
-	console.log('en el medio')
-    await python.stdout.on('data',  (data) => {
-		console.log('adentro')
-		largeDataSet.push(data);
-		res.json({message:largeDataSet.join("")})
+    var resultadoCheck = [];
+    const python = spawn('python', ['check.py', req.params.companyid]);
+    console.log('antes')
+    await python.stdout.on('data', (data) => {
+        console.log('durante')
+        resultadoCheck.push(data);
     });
-    await python.stdout.on('close',  (code) => {
-		console.log('final')
-    });
+    await python.stdout.on('close', code => {
+        console.log('despues')
+        let yes = (resultadoCheck.join(""))
+        if (yes.includes(String(req.params.dni))) {
+
+            console.log('el usuario esta')
+
+            python = spawn('python', ['train-pero-bien.py', req.params.companyid]);
+
+            await python.stdout.on('data', (data) => {
+
+                largeDataSet.push(data);
+                res.json({ message: largeDataSet.join("") })
+
+            });
+        }
+        else {
+            var largeDataSet = [];
+            python = spawn('python', ['train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
+            console.log('en el medio')
+            await python.stdout.on('data', (data) => {
+                console.log('adentro')
+                largeDataSet.push(data);
+                res.json({ message: largeDataSet.join("") })
+            });
+            await python.stdout.on('close', (code) => {
+                console.log('final')
+            });
+        }
+    })
 
 });
 userRouter.post('/uploadPfp', async function (req, res) {
@@ -329,9 +354,6 @@ userRouter.get('/authenticated', passport.authenticate('jwt', { session: false }
     const { username, role, dni, companyID, mail, cantidadFotos } = req.user;
     res.status(200).json({ isAuthenticated: true, user: { username, role, dni, modeloEntrenado: false, companyID, mail, cantidadFotos } });
 });
-
-
-
 
 
 module.exports = userRouter;
