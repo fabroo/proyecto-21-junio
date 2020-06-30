@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef, useEffect } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import AuthService from '../Services/AuthService';
 import { AuthContext } from '../Context/AuthContext';
 import swal from 'sweetalert';
@@ -11,7 +11,6 @@ const Upload = props => {
     const [style, setStyle] = useState({ display: { width: '0%' } })
     const [porcentaje, setPorcentaje] = useState({ porcentaje: '0%' })
     const [fotos, setFotos] = useState({ cantidad: 0 })
-    let timerID = useRef(null);
 
 
     const onChangeHandler = (e) => {
@@ -40,16 +39,16 @@ const Upload = props => {
                         setStyle({ width: (x + 1 / picture.length) * 100 + '%' })
                         setPorcentaje({ porcentaje: (x + 1 / picture.length) * 100 + '%' })
                     }
-                    AuthService.upload(data, user.username)
+                    AuthService.upload(data, user.username).then(res =>{
+                        console.log(res)
+                    })
                     AuthService.addFotos(user.dni, fotos)
                     swal({
                         icon: 'success',
                         title: 'Nice',
                         text: "fotos subidas"
                     })
-                    timerID = setTimeout(() => {
-                        props.history.push('/todos');
-                    }, 3000)
+                   
                 } else {
                     swal({
                         icon: 'error',

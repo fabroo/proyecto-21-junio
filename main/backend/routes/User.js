@@ -9,11 +9,14 @@ const User = require('../models/User');
 const multer = require('multer');
 const fs = require('fs');
 const Path = require('path');
+const {spawn} = require('child_process');
+
 
 
 userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     res.json(users)
+    
 })
 userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
     var companyid = req.params.companyid;
@@ -173,9 +176,7 @@ userRouter.post('/upload', async function (req, res) {
             }
             else {
                 cr = true;
-
             }
-
             if (cr) {
                 if (!fs.existsSync(direccion2)) {
                     fs.mkdir(direccion2, err => {
@@ -192,7 +193,6 @@ userRouter.post('/upload', async function (req, res) {
                     cb(null, direccion2)
                 }
             }
-
         },
         filename: function (req, file, cb) {
             var extArr = file.originalname;
@@ -206,13 +206,8 @@ userRouter.post('/upload', async function (req, res) {
             }
             cb(null, req.body.username + '-' + Date.now() + '.' + extension)
         }
-
-
-
     })
     var upload = multer({ storage: storage }).array('file')
-
-
     upload(req, res, function (err) {
         if (err instanceof multer.MulterError) {
             return res.status(500).json(err)
@@ -220,9 +215,25 @@ userRouter.post('/upload', async function (req, res) {
             return res.status(500).json(err)
         }
 
-        return res.status(200).send(req.file)
+        // return res.status(200).send(req.file)
 
     })
+    var largeDataSet = [];
+    
+	const python = spawn('python', ['train-bien.py', './fotitos/' + '1a2b3c' + '/']);
+	console.log('en el medio')
+    
+    await python.stdout.on('data',  (data) => {
+		console.log('adentro')
+		largeDataSet.push(data);
+		res.json({message:largeDataSet.join("")})
+
+    });
+    await python.stdout.on('close',  (code) => {
+		console.log('final')
+
+    });
+
 });
 userRouter.post('/uploadPfp', async function (req, res) {
 
