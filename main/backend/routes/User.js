@@ -61,7 +61,7 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const companyid = req.body.companyid
-    let path = 'fotitos owo/' + companyid + '/' + dni
+    let path = 'fotitos/' + companyid + '/' + dni
     const deleteFolderRecursive = async function (path) {
         if (fs.existsSync(path)) {
 
@@ -159,8 +159,8 @@ userRouter.post('/upload', async function (req, res) {
 
     var storage = multer.diskStorage({
         destination: function (req, file, cb) {
-            const direccion1 = 'fotitos owo/' + req.body.companyID;
-            const direccion2 = 'fotitos owo/' + req.body.companyID + '/' + req.body.username;
+            const direccion1 = 'fotitos/' + req.body.companyID;
+            const direccion2 = 'fotitos/' + req.body.companyID + '/' + req.body.username;
             var cr = false;
             var cro = false;
             if (!fs.existsSync(direccion1)) {
