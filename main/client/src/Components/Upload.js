@@ -38,9 +38,10 @@ const Upload = props => {
                         }
                         setStyle({ width: (x + 1 / picture.length) * 100 + '%' })
                         setPorcentaje({ porcentaje: (x + 1 / picture.length) * 100 + '%' })
+       
                     }
-                    AuthService.upload(data, user.username).then(res =>{
-                        console.log(res)
+                    AuthService.upload(data, user.username,user.companyID).then(res =>{
+                        swal(res.data.message)
                     })
                     AuthService.addFotos(user.dni, fotos)
                     swal({

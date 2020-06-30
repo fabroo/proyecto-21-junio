@@ -36,8 +36,8 @@ export default {
             .then(res => res)
 
     },
-    upload: async (data, user) => {
-        return await axios.post('http://' + ip + ':5000/user/upload', data)
+    upload: async (data, user,companyid) => {
+        return await axios.post('http://' + ip + ':5000/user/upload/'+companyid, data)
             .then(res => res)
 
     },

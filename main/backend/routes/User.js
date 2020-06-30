@@ -158,9 +158,9 @@ userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req
     res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "", cantidadFotos: 0 }, success: true });
 });
 
-userRouter.post('/upload', async function (req, res) {
-
+userRouter.post('/upload/:companyid', async function (req, res) {
     var storage = multer.diskStorage({
+
         destination: function (req, file, cb) {
             const direccion1 = 'fotitos/' + req.body.companyID;
             const direccion2 = 'fotitos/' + req.body.companyID + '/' + req.body.username;
@@ -214,24 +214,18 @@ userRouter.post('/upload', async function (req, res) {
         } else if (err) {
             return res.status(500).json(err)
         }
-
         // return res.status(200).send(req.file)
-
     })
     var largeDataSet = [];
-    
-	const python = spawn('python', ['train-bien.py', './fotitos/' + '1a2b3c' + '/']);
+    const python = spawn('python', ['train-bien.py', './fotitos/' + req.params.companyid ,req.params.companyid]);
 	console.log('en el medio')
-    
     await python.stdout.on('data',  (data) => {
 		console.log('adentro')
 		largeDataSet.push(data);
 		res.json({message:largeDataSet.join("")})
-
     });
     await python.stdout.on('close',  (code) => {
 		console.log('final')
-
     });
 
 });
