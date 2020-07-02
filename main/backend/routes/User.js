@@ -52,7 +52,16 @@ userRouter.get('/users/:compid', async (req, res) => {
 })
 userRouter.get('/delete/:_id', async (req, res) => {
     const id = req.params._id;
+    const user = await UserNew.findOne({ "_id": id })
     const users = await UserNew.deleteOne({ "_id": id })
+    var dni = user.dni;
+    var company = user.companyID;
+    const python = spawn('python', ['delete.py', dni, company])
+    var largeDataSet = []
+    await python.stdout.on('data', async (data) => {
+        largeDataSet.push(data);
+        var dataaaa = largeDataSet.join("")
+    });
     res.json(users)
 })
 
@@ -65,34 +74,56 @@ userRouter.post('/wipeFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const companyid = req.body.companyid
     let path = 'fotitos/' + companyid + '/' + dni
-    const deleteFolderRecursive = async function (path) {
-        if (fs.existsSync(path)) {
+    const user = await UserNew.findOne({ dni: dni })
+    var modelo = user.modeloEntrenado;
+    if (!modelo) {
+        const deleteFolderRecursive = async function (path) {
+            if (fs.existsSync(path)) {
 
-            fs.readdirSync(path).forEach((file, index) => {
+                fs.readdirSync(path).forEach((file, index) => {
 
-                const curPath = Path.join(path, file);
+                    const curPath = Path.join(path, file);
 
-                if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                    deleteFolderRecursive(curPath);
-                } else { // delete file
-                    fs.unlinkSync(curPath);
-                }
-            });
-            await UserNew.findOne({ dni: dni }, function (err, doc) {
-                if (err) return false;
+                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
+                        deleteFolderRecursive(curPath);
+                    } else { // delete file
+                        fs.unlinkSync(curPath);
+                    }
+                });
+                await UserNew.findOne({ dni: dni }, function (err, doc) {
+                    if (err) return false;
 
-                doc.cantidadFotos = 0;
-                doc.save()
+                    doc.cantidadFotos = 0;
+                    doc.save()
 
-            })
-            res.json({ message: 'todo ok', messageError: false })
+                })
+                res.json({ message: 'todo ok', messageError: false })
 
-            fs.rmdirSync(path);
-        } else {
-            res.json({ message: 'ENOENT no existe eso', messageError: true })
-        }
-    };
-    deleteFolderRecursive(path);
+                fs.rmdirSync(path);
+            } else {
+                res.json({ message: 'ENOENT no existe eso', messageError: true })
+            }
+        };
+        deleteFolderRecursive(path);
+    } else {
+        var largeDataSet = []
+        const python = spawn('python', ['delete.py', dni, companyid]);
+        await python.stdout.on('data', async (data) => {
+            largeDataSet.push(data);
+            var dataaaa = largeDataSet.join("")
+            res.json({ message: dataaaa })
+            if (!dataaaa.startsWith("Err")) {
+                var dni = req.params.dni;
+                await UserNew.findOne({ dni: dni }, function (err, doc) {
+                    if (err) return false;
+
+                    doc.cantidadFotos = 0;
+                    doc.modeloEntrenado = false;
+                    doc.save();
+                });
+            }
+        });
+    }
 })
 
 userRouter.post('/addFotos/:dni', async (req, res) => {
@@ -222,10 +253,10 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         console.log('durante')
         resultadoCheck.push(data);
     });
-    await python.stdout.on('close',async code => {
+    await python.stdout.on('close', async code => {
         console.log('despues')
         let yes = (resultadoCheck.join(""))
-       
+
         if (yes.includes(String(req.params.dni))) {
             var largeDataSet = [];
             console.log("addnewPics")
@@ -238,25 +269,42 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
             });
         }
         else {
-            if(fs.existsSync('./pickles/'+req.params.companyid+'/known_names')){
+            if (fs.existsSync('./pickles/' + req.params.companyid + '/known_names')) {
                 var largeDataSet = [];
                 console.log('train bien')
                 python = spawn('python', ['train-pero-bien.py', req.params.companyid]);
 
-                await python.stdout.on('data', (data) => {
+                await python.stdout.on('data', async (data) => {
                     console.log('adentro funco train bien')
                     largeDataSet.push(data);
-                    res.json({ message: largeDataSet.join("") })
+                    var fullData = largeDataSet.join("")
+                    res.json({ message: fullData })
+                    if (!fullData.startsWith("Err")) {
+                        var dni = req.params.dni;
+                        await UserNew.findOne({ dni: dni }, function (err, doc) {
+                            doc.modeloEntrenado = true;
+                            doc.save();
+                        });
+                    }
 
                 });
-            }else{
+            } else {
                 var largeDataSet = [];
                 python = spawn('python', ['train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
                 console.log('en el medio // train lento')
-                await python.stdout.on('data', (data) => {
+                await python.stdout.on('data', async (data) => {
                     console.log('adentro funco train lento')
                     largeDataSet.push(data);
+                    var fullData = largeDataSet.join("")
                     res.json({ message: largeDataSet.join("") })
+                    if (!fullData.startsWith("Err")) {
+                        var dni = req.params.dni;
+                        await UserNew.findOne({ dni: dni }, function (err, doc) {
+                            doc.modeloEntrenado = true;
+                            doc.save();
+                        });
+                    }
+
                 });
                 await python.stdout.on('close', (code) => {
                     console.log('final')

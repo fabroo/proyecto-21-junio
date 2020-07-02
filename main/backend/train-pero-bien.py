@@ -64,6 +64,6 @@ try:
         pass
     END = time.time()
 
-    print('en: '+str(END-START)+' segundos')
+    print('Terminado en: '+str(int(END-START))+' segundos')
 except Exception as ex:
-    print(ex)
+    print("Err: " + ex)

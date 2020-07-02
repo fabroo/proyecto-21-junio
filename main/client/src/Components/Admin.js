@@ -196,7 +196,7 @@ const Admin = props => {
                             </div>
                             <div className="modal-body">
                                 <input
-                                    type="text"
+                                    type="number"
                                     placeholder="User's DNI"
                                     required
                                     name="dni"
