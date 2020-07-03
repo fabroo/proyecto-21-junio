@@ -70,6 +70,11 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
     const users = await UserNew.findOne({ "dni": dni })
     res.json({ cantidad: users.cantidadFotos })
 })
+userRouter.get('/download/:companyid', async (req, res) => {
+    var companyid = req.params.companyid
+    res.download('./pickles/'+'1a2b3c'+'/known_names')
+})
+
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const companyid = req.body.companyid
@@ -148,6 +153,7 @@ const signToken = userID => {
         sub: userID
     }, "NoobCoder", { expiresIn: "1h" });
 }
+
 
 userRouter.put('/register', async (req, res) => {
     const { username, password, dni, companyID, mail } = req.body;

@@ -115,6 +115,11 @@ const Admin = props => {
         showUnRegister()
 
     }
+    const download = () =>{
+        AuthService.downloadP(user.companyID).then(res =>{
+            download(res)
+        })
+    }
     const handleChange = (e) => {
         setElInput({ ...elinput, [e.target.name]: e.target.value });
     }
@@ -174,6 +179,7 @@ const Admin = props => {
     return (
         <div className="container" >
             <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
+            <a href={"http://192.168.1.203:5000/user/download/"+user.companyID}className="display-4  text-center"><h2>Dowload</h2></a>
 
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
@@ -224,7 +230,6 @@ const Admin = props => {
                         <tr>
                             <th className="">Nombre</th>
                             <th className="">DNI</th>
-                            <th className="">Compañía</th>
                             <th className="">E-Mail</th>
                             <th className="">Modelo Entrenado?</th>
                             <th className="">Profile Picture</th>
@@ -240,7 +245,6 @@ const Admin = props => {
 
                                     <td>{user.username == user.dni ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
                                     <td ><p>{user.dni}</p></td>
-                                    <td><p>{user.companyID}</p></td>
                                     <td><p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.museail}</a></p></td>
                                     <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
                                     <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt="" /> : (<p>no hay :(</p>)}</td>

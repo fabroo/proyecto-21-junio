@@ -36,6 +36,13 @@ export default {
             .then(res => res)
 
     },
+    
+    downloadP: async (companyid) => {
+        //cambiar con la ip de tu casa
+        return await axios.get('http://' + ip + ':5000/user/download/' + companyid)
+            .then(res => res)
+
+    },
     upload: async (data, user,companyid,dni) => {
         return await axios.post('http://' + ip + ':5000/user/upload/'+companyid+'/'+dni, data)
             .then(res => res)
