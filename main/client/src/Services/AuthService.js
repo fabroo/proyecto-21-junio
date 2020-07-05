@@ -25,6 +25,7 @@ export default {
         return await axios.post('http://' + ip + ':5000/user/registerNew', user)
             .then(res => res)
     },
+    
     logout: () => {
         return fetch('/user/logout')
             .then(res => res.json())
@@ -40,6 +41,13 @@ export default {
     downloadP: async (companyid) => {
         //cambiar con la ip de tu casa
         return await axios.get('http://' + ip + ':5000/user/download/' + companyid)
+            .then(res => res)
+
+    },
+    
+    getMod: async () => {
+        //cambiar con la ip de tu casa
+        return await axios.get('http://' + ip + ':5000/user/mod')
             .then(res => res)
 
     },

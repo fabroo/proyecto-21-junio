@@ -8,7 +8,7 @@ import axios from 'axios'
 const Upload = props => {
     const [picture, setPicture] = useState(null);
     const { user } = useContext(AuthContext);
-    const [style, setStyle] = useState({ display: { width: '0%' } })
+    const [style, setStyle] = useState({  width: '0%' })
     const [porcentaje, setPorcentaje] = useState({ porcentaje: '0%' })
     const [fotos, setFotos] = useState({ cantidad: 0 })
 
@@ -36,14 +36,13 @@ const Upload = props => {
                                 data.append('file', picture[x])
                             }
                         }
-                        setStyle({ width: (x + 1 / picture.length) * 100 + '%' })
-                        setPorcentaje({ porcentaje: (x + 1 / picture.length) * 100 + '%' })
-       
+                        setStyle({ width: ((x + 1) / picture.length) * 100 + '%' })
+                        setPorcentaje({ porcentaje: ((x + 1) / picture.length) * 100 + '%' })
                     }
                     AuthService.upload(data, user.username,user.companyID,user.dni).then(res =>{
                         swal(res.data.message)
                     })
-                    AuthService.addFotos(user.dni, fotos)
+                    
                     swal({
                         icon: 'success',
                         title: 'Nice',
@@ -68,14 +67,9 @@ const Upload = props => {
                 footer: 'Volve a intentar'
             })
         }
-
-
-
-
     }
     return (
         <div className="container">
-
             <div className="row">
                 <div className="col-sm"></div>
                 <div className="col-sm">

@@ -107,8 +107,8 @@ const Admin = props => {
         const dni = elinput.dni;
         const role = elinput.role;
         const username = String(dni);
-
-        await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username }).then(res => {
+        const companyid = user.companyID
+        await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username,companyid:companyid }).then(res => {
             console.log(res)
         }, [])
 

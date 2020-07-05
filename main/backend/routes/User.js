@@ -17,6 +17,13 @@ userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     res.json(users)
 
+
+})
+userRouter.get('/mod', async (req, res) => {
+    const users = await UserNew.find()
+    res.json(users)
+
+
 })
 userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
     var companyid = req.params.companyid;
@@ -72,7 +79,7 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
 })
 userRouter.get('/download/:companyid', async (req, res) => {
     var companyid = req.params.companyid
-    res.download('./pickles/'+'1a2b3c'+'/known_names')
+    res.download('./pickles/' + '1a2b3c' + '/known_names')
 })
 
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
@@ -144,17 +151,12 @@ userRouter.post('/addFotos/:dni', async (req, res) => {
     res.json({ message: { msgBody: "todo ok", msgError: false } })
 
 })
-
-
-
 const signToken = userID => {
     return JWT.sign({
         iss: "NoobCoder",
         sub: userID
     }, "NoobCoder", { expiresIn: "1h" });
 }
-
-
 userRouter.put('/register', async (req, res) => {
     const { username, password, dni, companyID, mail } = req.body;
     const user_ = await UserNew.find({ companyID: companyID, dni: dni, createdAccount: false })
@@ -194,6 +196,7 @@ userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req
     res.clearCookie('access_token');
     res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "", cantidadFotos: 0 }, success: true });
 });
+
 
 userRouter.post('/upload/:companyid/:dni', async function (req, res) {
     var storage = multer.diskStorage({
@@ -259,6 +262,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         console.log('durante')
         resultadoCheck.push(data);
     });
+
     await python.stdout.on('close', async code => {
         console.log('despues')
         let yes = (resultadoCheck.join(""))
@@ -271,8 +275,34 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                 console.log('adentro funco add pics')
                 largeDataSet.push(data);
                 res.json({ message: largeDataSet.join("") })
-
             });
+            await python.stdout.on('close', async (code) => {
+                console.log('final')
+                var check_result = [];
+                var python = spawn('python', ['check.py', req.params.companyid]);
+                var arr = [];
+                var arrFixed = []
+                console.log('antes')
+                await python.stdout.on('data', (data) => {
+                    console.log('durante')
+                    check_result.push(data);
+                });
+                await python.stdout.on('close', async code => {
+                    const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+                    arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
+                    arr.forEach((user) => {
+                        var user1 = user.trim()
+                        var user2 = user1.slice(1, user1.length - 1)
+                        arrFixed.push((user2))
+                    })
+                    var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
+                    await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
+                        doc.cantidadFotos = numberOfOccurrencies;
+                        doc.save();
+                    });
+                })
+            });
+
         }
         else {
             if (fs.existsSync('./pickles/' + req.params.companyid + '/known_names')) {
@@ -286,13 +316,44 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                     var fullData = largeDataSet.join("")
                     res.json({ message: fullData })
                     if (!fullData.startsWith("Err")) {
+                        //ACA YA SE AGREGAN NUEVAS COSAS AL PICKLE
                         var dni = req.params.dni;
+                        console.log('adentro train bien')
                         await UserNew.findOne({ dni: dni }, function (err, doc) {
                             doc.modeloEntrenado = true;
                             doc.save();
                         });
                     }
 
+                });
+                await python.stdout.on('close', async (code) => {
+                    console.log('final')
+                    var check_result = [];
+                    var python = spawn('python', ['check.py', req.params.companyid]);
+                    var arr = [];
+                    var arrFixed = []
+                    console.log('antes')
+                    await python.stdout.on('data', (data) => {
+                        console.log('durante')
+                        check_result.push(data);
+                    });
+                    await python.stdout.on('close', async code => {
+                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
+                        arr.forEach((user) => {
+                            var user1 = user.trim()
+                            var user2 = user1.slice(1, user1.length - 1)
+                            arrFixed.push((user2))
+                        })
+                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
+                        console.log(numberOfOccurrencies)
+                        console.log(arrFixed.length)
+
+                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
+                            doc.cantidadFotos = numberOfOccurrencies;
+                            doc.save();
+                        });
+                    })
                 });
             } else {
                 var largeDataSet = [];
@@ -304,6 +365,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                     var fullData = largeDataSet.join("")
                     res.json({ message: largeDataSet.join("") })
                     if (!fullData.startsWith("Err")) {
+                        //ACA SE AGREGAN NUEVAS COSAS AL PICKLE
                         var dni = req.params.dni;
                         await UserNew.findOne({ dni: dni }, function (err, doc) {
                             doc.modeloEntrenado = true;
@@ -312,12 +374,37 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                     }
 
                 });
-                await python.stdout.on('close', (code) => {
+                await python.stdout.on('close', async (code) => {
                     console.log('final')
+                    var check_result = [];
+                    var python = spawn('python', ['check.py', req.params.companyid]);
+                    var arr = [];
+                    var arrFixed = []
+                    console.log('antes')
+                    await python.stdout.on('data', (data) => {
+                        console.log('durante')
+                        check_result.push(data);
+                    });
+                    await python.stdout.on('close', async code => {
+                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
+                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
+                        arr.forEach((user) => {
+                            var user1 = user.trim()
+                            var user2 = user1.slice(1, user1.length - 1)
+                            arrFixed.push((user2))
+                        })
+                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
+                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
+                            doc.cantidadFotos = numberOfOccurrencies;
+                            doc.save();
+                        });
+                    })
                 });
             }
         }
+
     })
+
 
 });
 userRouter.post('/uploadPfp', async function (req, res) {

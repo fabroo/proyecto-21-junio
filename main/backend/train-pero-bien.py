@@ -24,6 +24,7 @@ try:
     for i in range(len(known_names)):
         known_names[i].rstrip('\r\n')
     for name in os.listdir(NEW_FACES):
+        
         for filename in os.listdir(f'{NEW_FACES}/{name}'):
             # Load an image
             image = face_recognition.load_image_file(f'{NEW_FACES}/{name}/{filename}')
@@ -31,7 +32,10 @@ try:
                 encoding = face_recognition.face_encodings(image)[0]
                 new_faces_array.append(encoding)
                 new_names_array.append(name)
-
+                dir_done = f'./known/{company}'
+                if not os.path.exists(f'{dir_done}/{name}'):
+                    os.mkdir(f'{dir_done}/{name}')
+                shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{dir_done}/{name}')
             except:
                 dir_error = './error/'
                 if not os.path.exists(f'{dir_error}/{name}'):
@@ -39,8 +43,7 @@ try:
 
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{dir_error}/{name}/{filename}')
                 
-        dir_done = f'./known/{company}'
-        shutil.move(f'{NEW_FACES}/{name}',f'{dir_done}/{name}')
+        
 
     arrayPrevio_names = np.array(known_names)
     arrayPrevio_faces = np.array(known_faces)
