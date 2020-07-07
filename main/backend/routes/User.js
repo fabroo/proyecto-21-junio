@@ -338,6 +338,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                         check_result.push(data);
                     });
                     await python.stdout.on('close', async code => {
+                        console.log('adentro del close')
                         const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
                         arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
                         arr.forEach((user) => {
@@ -347,12 +348,12 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                         })
                         var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
                         console.log(numberOfOccurrencies)
-                        console.log(arrFixed.length)
 
                         await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
                             doc.cantidadFotos = numberOfOccurrencies;
                             doc.save();
                         });
+                        console.log('cambiado')
                     })
                 });
             } else {

@@ -8,10 +8,10 @@ try:
     import math
     import sys
 
-    company = sys.argv[1]
+    company = '1a2b3c'
 
-    kf = open('./pickles/'+company+'/known_faces','rb')
-    kn = open('./pickles/'+company+'/known_names','rb')
+    kf = open('./main/backend/pickles/'+company+'/known_faces','rb')
+    kn = open('./main/backend/pickles/'+company+'/known_names','rb')
     known_faces = pickle.load(kf)
     known_names = pickle.load(kn)
     kf.close()
