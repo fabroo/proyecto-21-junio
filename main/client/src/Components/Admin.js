@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import { AuthContext } from '../Context/AuthContext';
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
@@ -11,12 +11,31 @@ const Admin = props => {
 
     let [registradoClass, setRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
     let [noregistradoClass, setNoRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
-    let [add, setAdd] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
-    let [load, setLoad] = useState({ style: { display: 'block', margin: 'auto .5rem' } })
+    let [add, setAdd] = useState({ style: { display: 'block', margin: 'auto .5rem' } })
+    let [loading, isLoading] = useState(false);
+    useEffect(() => {
+        isLoading(true)
 
+        async function showw() {
+            AuthService.getData(user.companyID).then(res => {
+
+                setContent(res.data.sort(function (a, b) {
+                    if (a.username < b.username) { return -1; }
+                    if (a.username > b.username) { return 1; }
+                    return 0;
+                }));
+
+                setRegistradoClass({ display: 'block' })
+                setNoRegistradoClass({ display: 'block' })
+                isLoading(false)
+
+            }, [])
+        }
+        showw()
+
+    }, []);
 
     const showData = () => {
-
         AuthService.getData(user.companyID).then(res => {
             setContent(res.data.sort(function (a, b) {
                 if (a.username < b.username) { return -1; }
@@ -24,13 +43,9 @@ const Admin = props => {
                 return 0;
             }));
 
-            setAdd({ style: { display: 'block' } })
         }, [])
     }
     const showRegister = (e) => {
-        setLoad({ display: 'none' })
-        setAdd({ display: "none" })
-
         setRegistradoClass({ display: 'none' })
         setNoRegistradoClass({ display: 'block' })
 
@@ -54,7 +69,6 @@ const Admin = props => {
     }
     const showUnRegister = (e) => {
         setRegistradoClass({ display: 'block' })
-        setAdd({ display: "block" })
         setNoRegistradoClass({ display: 'none' })
         AuthService.getData(user.companyID).then(res => {
             const all = res.data;
@@ -108,15 +122,15 @@ const Admin = props => {
         const role = elinput.role;
         const username = String(dni);
         const companyid = user.companyID
-        await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username,companyid:companyid }).then(res => {
+        await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username, companyid: companyid }).then(res => {
             console.log(res)
         }, [])
 
         showUnRegister()
 
     }
-    const download = () =>{
-        AuthService.downloadP(user.companyID).then(res =>{
+    const download = () => {
+        AuthService.downloadP(user.companyID).then(res => {
             download(res)
         })
     }
@@ -176,17 +190,18 @@ const Admin = props => {
             })
         }
     }
+    
+console.log(content)
     return (
         <div className="container" >
             <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
-            <a href={"http://192.168.1.203:5000/user/download/"+user.companyID}className="display-4  text-center"><h2>Dowload</h2></a>
+            <a href={"http://192.168.1.203:5000/user/download/" + user.companyID} className="display-4  text-center"><h2>Dowload</h2></a>
 
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
-                    <button style={load} className="btn  btn-warning m-2" onClick={showRegister}>LOAD..</button>
                     <button className="btn btn-primary m-2 none" style={registradoClass} onClick={showRegister}>REGISTRADOS</button>
                     <button className="btn btn-secondary m-2 none" style={noregistradoClass} onClick={showUnRegister}>NO REGISTRADOS</button>
-                    <button style={add} type="button" className="btn btn-info m-2 none" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
+                    <button  type="button" className="btn btn-info m-2" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
 
                 </div>
                 {/* <button className="btn btn-info">+</button> */}
@@ -223,42 +238,44 @@ const Admin = props => {
                     </div>
                 </div>
             </div>
-            <div>
+            {!loading ? (
+                <div>
 
-                <table className="table table-hover text-center table-responsive-lg">
-                    <thead className="thead-dark">
-                        <tr>
-                            <th className="">Nombre</th>
-                            <th className="">DNI</th>
-                            <th className="">E-Mail</th>
-                            <th className="">Modelo Entrenado?</th>
-                            <th className="">Profile Picture</th>
-                            <th className="">Rol</th>
-                            <th className="">Cantidad de Fotos</th>
-                            <th>Eliminar</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {content ? (
-                            content.map(user =>
-                                <tr key={user._id}>
+                    <table className="table table-hover text-center table-responsive-lg">
+                        <thead className="thead-dark">
+                            <tr>
+                                <th className="">Nombre</th>
+                                <th className="">DNI</th>
+                                <th className="">E-Mail</th>
+                                <th className="">Modelo Entrenado?</th>
+                                <th className="">Profile Picture</th>
+                                <th className="">Rol</th>
+                                <th className="">Cantidad de Fotos</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {content ? (
+                                content.map(user =>
+                                    <tr key={user._id}>
 
-                                    <td>{user.username == user.dni ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
-                                    <td ><p>{user.dni}</p></td>
-                                    <td><p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.museail}</a></p></td>
-                                    <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                    <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt="" /> : (<p>no hay :(</p>)}</td>
+                                        <td>{!user.createdAccount ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
+                                        <td ><p>{user.dni}</p></td>
+                                <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>):(<p>No creada</p>)}</td>
+                                        <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt= {user.username} /> : (<p>no hay :(</p>)}</td>
 
-                                    <td><p>{user.role}</p></td>
-                                    <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
+                                        <td><p>{user.role}</p></td>
+                                        <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
 
-                                    <td> {user.role !== "admin" ? (<button className="btn btn-danger" onClick={() => chau(user._id)}>X</button>) : (<p>es admin bro</p>)} </td>
-                                </tr>)
+                                        <td> {user.role !== "admin" ? (<button className="btn btn-danger" onClick={() => chau(user._id)}>X</button>) : user.role !== "mod" ? ((<button className="btn btn-danger" onClick={() => chau(user._id)}>X</button>)) : (<p>es admin bro</p>)} </td>
+                                    </tr>)
 
-                        ) : (<tr><td>No content...</td></tr>)}
-                    </tbody>
-                </table>
-            </div>
+                            ) : (<tr><td>No content...</td></tr>)}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (<h1>loading</h1>)}
 
             <br />
             <br />

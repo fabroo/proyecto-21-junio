@@ -129,7 +129,7 @@ const Register = props => {
 
                     </div>
                     <div className="col-md-6">
-                        <input type="file" onChange={onChangeHandler} name="holu" className="custom-file-input" id="customFile" accept="image/png, image/jpeg,image/jpg" />
+                        <input required="true" type="file" onChange={onChangeHandler} name="holu" className="custom-file-input" id="customFile" accept="image/png, image/jpeg,image/jpg" />
                         <label className="custom-file-label" htmlFor="customFile">Choose file</label>
                     </div>
 
