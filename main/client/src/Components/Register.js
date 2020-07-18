@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import AuthService from '../Services/AuthService';
 import { Link } from 'react-router-dom'
 import Message from '../Components/Message';
-import swal from 'sweetalert';
 
 const Register = props => {
     const [user, setUser] = useState({ username: "", password: "", dni: "", companyID: "", mail: "" });
@@ -38,11 +37,7 @@ const Register = props => {
                 }
             }
             AuthService.uploadPfp(data, user.username)
-            swal({
-                icon: 'success',
-                title: 'Nice',
-                text: "fotos subidas"
-            })
+           
             timerID = setTimeout(() => {
                 props.history.push('/todos');
             }, 3000)
@@ -82,6 +77,11 @@ const Register = props => {
         <div className="container " style={{ margin: '20vh auto auto auto' }}>
             <form onSubmit={onSubmit}>
                 <h3>Please Register</h3>
+<div className="col-md-6" style={{margin:'auto auto'}}>
+<label className="custom-file-label " htmlFor="holu" >Choose file</label>
+                        <input required={true} type="file" onChange={onChangeHandler} name="holu" className="custom-file-input form-control m" id="customFile" accept="image/png, image/jpeg,image/jpg" />
+
+</div>
                 <label htmlFor="username" className="sr-only">Username: </label>
                 <input type="text"
                     name="username"
@@ -128,13 +128,10 @@ const Register = props => {
                             placeholder="Enter company Id " />
 
                     </div>
-                    <div className="col-md-6">
-                        <input required="true" type="file" onChange={onChangeHandler} name="holu" className="custom-file-input" id="customFile" accept="image/png, image/jpeg,image/jpg" />
-                        <label className="custom-file-label" htmlFor="customFile">Choose file</label>
-                    </div>
+
 
                 </div>
-
+                     
                 <button className="btn  btn-primary m-2 row"
                     type="submit">Register</button>
                 <div className="d-flex justify-content-end">

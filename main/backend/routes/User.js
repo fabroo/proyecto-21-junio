@@ -163,19 +163,28 @@ userRouter.put('/register', async (req, res) => {
 
 
     if (user_.length !== 0 && user_ !== []) {
-        await UserNew.findOne({ dni: dni }, function (err, doc) {
+
+        await UserNew.findOne({ dni: dni }, async function (err, doc) {
             if (err) return false;
-            doc.password = password;
-            doc.username = username;
-            doc.mail = mail;
-            doc.createdAccount = true;
-            doc.save()
+
+            const users = await UserNew.find({username:username})
+            if(users.length === 0) {
+                doc.password = password;
+                doc.username = username;
+                doc.mail = mail;
+                doc.createdAccount = true;
+                doc.save()
+            } else{
+            res.json({ message: { msgBody: "username taken", msgError: true } })
+                
+            }
+            res.json({ message: { msgBody: "cuenta reg", msgError: false } })
+            
         })
 
-        res.json({ message: { msgBody: "todo ok", msgError: false } })
 
     } else {
-        res.json({ message: { msgBody: "error", msgError: true } });
+        res.json({ message: { msgBody: "hubo un error", msgError: true } });
     }
 
 });
