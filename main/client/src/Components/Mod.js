@@ -7,6 +7,7 @@ const Admin = props => {
     const [search, setSearch] = useState("");
     let [elinput, setElInput] = useState({ dni: 0, comapnyid: "", role: "user", username: "" })
     let [loading, isLoading] = useState(false)
+    let [newDict, setNewDict] = useState({})
     const handleInput = e => {
         setSearch(e.target.value);
     };
@@ -25,17 +26,22 @@ const Admin = props => {
                     if (a.companyID > b.companyID) { return 1; }
                     return 0;
                 }));
-                setContenido(res.data.sort(function (a, b) {
+                var contendio = res.data.sort(function (a, b) {
                     if (a.companyID < b.companyID) { return -1; }
                     if (a.companyID > b.companyID) { return 1; }
                     return 0;
-                }));
-                isLoading(false)
+                })
+                setContenido(contendio);
 
+                isLoading(false)
+                rearrange(contendio)
             }, [])
 
         }
+
         showw()
+
+
     }, []);
 
 
@@ -104,7 +110,35 @@ const Admin = props => {
 
         }, [])
     }
+    const rearrange = (contenidoo) => {
+        console.log('contee', contenidoo)
+        var newDict = {}
+        var users = []
+        if (contenidoo) {
+            let companyid = ""
+            for (let i = 0; i < contenidoo.length; i++) {
+                if (contenidoo[i].companyID !== companyid) {
 
+                    companyid = contenidoo[i].companyID
+                    users.push(contenidoo[i])
+                    console.log(newDict[companyid])
+
+                    if (users) {
+                        newDict[contenidoo[i].companyID] = users
+                        users = []
+                    } else {
+                        users.push(contenidoo[i])
+                    }
+
+                }
+                else {
+                    users.push(contenidoo[i])
+                }
+            }
+        }
+        console.log('dict', newDict)
+        setNewDict(newDict)
+    }
     return (
         <div className="container" >
             <div className="m-2 arriba d-flex flex-row-reverse">
@@ -171,24 +205,24 @@ const Admin = props => {
             </div>
             {!loading ? (
                 <div>
+                    {contenido ? (
+                        contenido.map(user =>
+                            <table className="table table-hover text-center table-responsive-lg">
+                                <thead className="thead-dark">
+                                    <tr>
+                                        <th className="">Nombre</th>
+                                        <th className="">DNI</th>
+                                        <th className="">E-Mail</th>
+                                        <th className="">Modelo Entrenado?</th>
+                                        <th className="">Profile Picture</th>
+                                        <th className="">Rol</th>
+                                        <th>Comp. ID</th>
+                                        <th className="">Cantidad de Fotos</th>
+                                        <th>Eliminar</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                    <table className="table table-hover text-center table-responsive-lg">
-                        <thead className="thead-dark">
-                            <tr>
-                                <th className="">Nombre</th>
-                                <th className="">DNI</th>
-                                <th className="">E-Mail</th>
-                                <th className="">Modelo Entrenado?</th>
-                                <th className="">Profile Picture</th>
-                                <th className="">Rol</th>
-                                <th>Comp. ID</th>
-                                <th className="">Cantidad de Fotos</th>
-                                <th>Eliminar</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {contenido ? (
-                                contenido.map(user =>
                                     <tr key={user._id}>
 
                                         <td>{!user.createdAccount ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
@@ -202,11 +236,12 @@ const Admin = props => {
                                         <td><p >{user.createdAccount ? (user.cantidadFotos) : (<p>no creada</p>)}</p></td>
 
                                         <td> {user.role !== "mod" ? (<button className="btn btn-danger" onClick={() => chau(user._id)} >X</button>) : (<p>es mod bro</p>)} </td>
-                                    </tr>)
+                                    </tr>
+                                </tbody>
+                            </table>
+                        )
 
-                            ) : (<tr><td>No content...</td></tr>)}
-                        </tbody>
-                    </table>
+                    ) : (<tr><td>No content...</td></tr>)}
                 </div>
             ) : (<h1>loading</h1>)}
 

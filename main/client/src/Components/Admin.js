@@ -18,17 +18,24 @@ const Admin = props => {
 
         async function showw() {
             AuthService.getData(user.companyID).then(res => {
-
-                setContent(res.data.sort(function (a, b) {
+                const all = res.data;
+                const users = [];
+    
+                all.map(user => {
+                    if (user.createdAccount) {
+                        users.push(user)
+                    }
+                })
+    
+                setContent(users.sort(function (a, b) {
                     if (a.username < b.username) { return -1; }
                     if (a.username > b.username) { return 1; }
                     return 0;
                 }));
+                isLoading(false)
 
                 setRegistradoClass({ display: 'block' })
                 setNoRegistradoClass({ display: 'block' })
-                isLoading(false)
-
             }, [])
         }
         showw()
@@ -49,7 +56,6 @@ const Admin = props => {
         setRegistradoClass({ display: 'none' })
         setNoRegistradoClass({ display: 'block' })
 
-        console.log('http://' + String(process.env.LA_IP) + ':5000/user/register');
         AuthService.getData(user.companyID).then(res => {
             const all = res.data;
             const users = [];
@@ -122,8 +128,10 @@ const Admin = props => {
         const role = elinput.role;
         const username = String(dni);
         const companyid = user.companyID
+        
+        
         await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username, companyid: companyid }).then(res => {
-            console.log(res)
+            swal('Error!',res.data.message.msgBody)
         }, [])
 
         showUnRegister()
@@ -191,7 +199,6 @@ const Admin = props => {
         }
     }
     
-console.log(content)
     return (
         <div className="container" >
             <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>

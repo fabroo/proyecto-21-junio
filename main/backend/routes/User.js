@@ -36,14 +36,14 @@ userRouter.post('/registerNew', (req, res) => {
     const { dni, companyID, role, username } = req.body;
     UserNew.findOne({ dni }, (err, user) => {
         if (err)
-            res.status(500).json({ message: { msgBody: "Error has occured", msgError: true } });
+            res.json({ message: { msgBody: "Error has occured", msgError: true } });
         if (user)
-            res.status(400).json({ message: { msgBody: "Username is already taken", msgError: true } });
+            res.json({ message: { msgBody: "Username is already taken", msgError: true } });
         else {
             const newUser = new UserNew({ username, dni, companyID, role });
             newUser.save(err => {
                 if (err) {
-                    res.status(500).json({ message: { msgBody: "Error has occured", msgError: true } });
+                    res.json({ message: { msgBody: "Error has occured", msgError: true } });
                 }
                 else
                     res.status(201).json({ message: { msgBody: "Account successfully created", msgError: false } });
