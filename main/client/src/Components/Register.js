@@ -23,27 +23,22 @@ const Register = props => {
 
     }
     const onClickHandler = () => {
-
-        AuthService.getFotos(user.dni).then(res => {
-            const data = new FormData()
-            data.append('username', user.dni)
-            data.append('companyID', user.companyID)
-            for (var x = 0; x < picture.length; x++) {
-                let extensiones = ['.jpg', '.jpeg', '.png'];
-                for (let i = 0; i < extensiones.length; i++) {
-                    if (picture[x].name.includes(extensiones[i])) {
-                        data.append('file', picture[x])
-                    }
+        const data = new FormData()
+        data.append('username', user.dni)
+        data.append('companyID', user.companyID)
+        for (var x = 0; x < picture.length; x++) {
+            let extensiones = ['.jpg', '.jpeg', '.png'];
+            for (let i = 0; i < extensiones.length; i++) {
+                if (picture[x].name.includes(extensiones[i])) {
+                    data.append('file', picture[x])
                 }
             }
-            AuthService.uploadPfp(data, user.username)
+        }
+        AuthService.uploadPfp(data, user.username)
 
-            timerID = setTimeout(() => {
-                props.history.push('/');
-            }, 3000)
-
-        })
-
+        timerID = setTimeout(() => {
+            props.history.push('/');
+        }, 3000)
     }
     const onChange = e => {
         setUser({ ...user, [e.target.name]: e.target.value });
@@ -79,7 +74,7 @@ const Register = props => {
                 <h3>Please Register</h3>
                 <div className="col-md-6" style={{ margin: 'auto auto' }}>
                     <label className="custom-file-label " htmlFor="holu" >Choose file</label>
-                    <input required={true} type="file" onChange={onChangeHandler} name="holu" className="custom-file-input form-control m" id="customFile" accept="image/png, image/jpeg,image/jpg" />
+                    <input required={true} type="file" onChange={onChangeHandler} name="holu" className="custom-file-input form-control m" id="customFile" accept="image/png,image/jpg" />
 
                 </div>
                 <label htmlFor="username" className="sr-only">Username: </label>

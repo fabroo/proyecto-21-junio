@@ -27,8 +27,19 @@ userRouter.get('/mod', async (req, res) => {
 userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
     var companyid = req.params.companyid;
     var dni = req.params.dni;
-    //    res.sendFile('\\users\\' + companyid + '\\' + dni + '.jpg', { root: '.' })
-    res.sendFile('\\users\\' + companyid + '\\' + dni + '\\' + dni + '.jpg', { root: '.' })
+
+    try {
+        fs.access(`.\\users\\${companyid}\\${dni}\\${dni}.png`, fs.F_OK, (err) => {
+            res.sendFile(`\\users\\${companyid}\\${dni}\\${dni}.png`, { root: '.' })
+        })
+    }
+    catch{
+        fs.access(`.\\users\\${companyid}\\${dni}.jpg`, fs.F_OK, (err) => {
+            res.sendFile(`\\users\\${companyid}\\${dni}.jpg`, { root: '.' })
+        })
+    }
+
+
 })
 
 userRouter.post('/registerNew', (req, res) => {
@@ -166,19 +177,19 @@ userRouter.put('/register', async (req, res) => {
         await UserNew.findOne({ dni: dni }, async function (err, doc) {
             if (err) return false;
 
-            const users = await UserNew.find({username:username})
-            if(users.length === 0) {
+            const users = await UserNew.find({ username: username })
+            if (users.length === 0) {
                 doc.password = password;
                 doc.username = username;
                 doc.mail = mail;
                 doc.createdAccount = true;
                 doc.save()
-            } else{
-            res.json({ message: { msgBody: "username taken", msgError: true } })
-                
+            } else {
+                res.json({ message: { msgBody: "username taken", msgError: true } })
+
             }
             res.json({ message: { msgBody: "cuenta reg", msgError: false } })
-            
+
         })
 
 
