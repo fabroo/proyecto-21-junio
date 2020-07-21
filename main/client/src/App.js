@@ -3,7 +3,6 @@ import Navbar from './Components/Navbar';
 import Footer from './Components/footer'
 import Login from './Components/Login';
 import Home from './Components/Home';
-import Todos from './Components/Todos';
 import Upload from './Components/Upload';
 import Register from './Components/Register';
 import Admin  from './Components/Admin';
@@ -20,7 +19,6 @@ function App() {
       <Route exact path="/" component={Home}/>
       <UnPrivateRoute path="/login" component={Login}/>
       <UnPrivateRoute path="/register" component={Register}/>
-      <PrivateRoute path="/todos" roles={["user","admin","mod"]} component={Todos}/>
       <PrivateRoute path="/admin" roles={["admin","mod"]} component={Admin}/>
       <PrivateRoute path="/mod" roles={["mod"]} component={Mod}/>
       <PrivateRoute path="/upload" roles={["user","admin","mod"]} component={Upload}/>

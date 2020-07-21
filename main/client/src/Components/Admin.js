@@ -164,7 +164,7 @@ const Admin = props => {
                         case "borrar":
                             swal("Eliminado", "Imagenes eliminadas", "success");
                             await AuthService.wipeFotos(dni, companyID).then(res => {
-                                console.log(res)
+                                //console.log(res)
                             })
                             AuthService.getData(user.companyID).then(res => {
                                 const all = res.data;

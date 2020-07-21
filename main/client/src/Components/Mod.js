@@ -85,7 +85,7 @@ const Admin = props => {
         const username = String(dni);
         const companyid = elinput.companyid;
         await AuthService.registerNew({ dni: dni, companyID: companyid, role: role, username: username, companyid: companyid }).then(res => {
-            console.log(res)
+            //console.log(res)
         }, [])
 
         showData()
@@ -111,7 +111,7 @@ const Admin = props => {
         }, [])
     }
     const rearrange = (contenidoo) => {
-        console.log('contee', contenidoo)
+        //console.log('contee', contenidoo)
         var newDict = {}
         var users = []
         if (contenidoo) {
@@ -121,7 +121,7 @@ const Admin = props => {
 
                     companyid = contenidoo[i].companyID
                     users.push(contenidoo[i])
-                    console.log(newDict[companyid])
+                    //console.log(newDict[companyid])
 
                     if (users) {
                         newDict[contenidoo[i].companyID] = users
@@ -136,7 +136,7 @@ const Admin = props => {
                 }
             }
         }
-        console.log('dict', newDict)
+        //console.log('dict', newDict)
         setNewDict(newDict)
     }
     return (

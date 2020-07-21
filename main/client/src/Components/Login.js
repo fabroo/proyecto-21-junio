@@ -20,11 +20,11 @@ const Login = props=>{
             if(isAuthenticated){
                 authContext.setUser(user);
                 authContext.setIsAuthenticated(isAuthenticated);
-                props.history.push('/todos');
+                props.history.push('/');
                 
             }
             if(error){
-                console.log(error)
+                //console.log(error)
                 setMessage('usuario incorrecto');
             }
             

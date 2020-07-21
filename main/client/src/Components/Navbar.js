@@ -19,17 +19,17 @@ const Navbar = props => {
         return (
             <>
                 <Link to="/" className="nav-item">
-                    <li className="nav-link">
+                    <li className="nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Home
                     </li>
                 </Link>
                 <Link to="/login" className="nav-item">
-                    <li className="nav-link">
+                    <li className="nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Login
                     </li>
                 </Link>
                 <Link to="/register" className="nav-item">
-                    <li className=" nav-link">
+                    <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Register
                     </li>
                 </Link>
@@ -46,23 +46,18 @@ const Navbar = props => {
                     <p style={{ marginLeft: '.5rem', padding: 0, marginBottom: 0 }}>{user.username}</p>
                 </div>) : (null)}
                 <Link to="/" className="nav-item">
-                    <li className=" nav-link">
+                    <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Home
-                    </li>
-                </Link>
-                <Link to="/todos" className="nav-item">
-                    <li className=" nav-link">
-                        Todos
                     </li>
                 </Link>
                 {
                     user.role === "admin" ?
                         <Link to="/admin" className="nav-item">
-                            <li className=" nav-link">
+                            <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                                 Admin
                         </li>
                         </Link> : user.role === "mod" ? <Link to="/admin" className="nav-item">
-                            <li className=" nav-link">
+                            <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                                 Admin
                         </li>
                         </Link> : null
@@ -70,20 +65,21 @@ const Navbar = props => {
                 {
                     user.role === "mod" ? (
                         <Link to="/mod" className="nav-item">
-                        <li className=" nav-link">
+                        <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                             MOD
                 </li>
                     </Link>
                     ):null
                 }
-                <Link className=" nav-item " to="/upload">
-                    <li className=" nav-link">
+                <Link className=" nav-item " to="/upload" >
+                    
+                    <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Upload
                     </li>
                 </Link>
                 <Link type="button"
                     className=" nav-item " to="/"
-                    onClick={onClickLogoutHandler}><li className=" nav-link">
+                    onClick={onClickLogoutHandler}><li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Logout
                     </li>
                 </Link>

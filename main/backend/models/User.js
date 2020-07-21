@@ -34,9 +34,7 @@ const UserSchema = new mongoose.Schema({
     cantidadFotos: {
         type: Number,
         default: 0
-    },
-
-    todos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Todo' }]
+    }
 });
 
 UserSchema.pre('save', function (next) {

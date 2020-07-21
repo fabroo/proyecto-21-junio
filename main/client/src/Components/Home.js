@@ -8,7 +8,7 @@ import Tievo from '../photos/tievo.jpg'
 const Home = (props) => {
 
     const authContext = useContext(AuthContext);
-    //console.log(authContext);
+    ////console.log(authContext);
 
     return (
         <div className="holu"><div className="container">

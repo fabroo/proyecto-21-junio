@@ -18,7 +18,7 @@ const Python = props=>{
     const onSubmit = e =>{
         e.preventDefault();
         AuthService.postPython(user).then(data=>{
-            console.log(data)
+            //console.log(data)
             setUrl({url:((data).data.message)})
             let yes = ((data).data.message)
             setMessage({msgBody:"el link es: "+ yes})
