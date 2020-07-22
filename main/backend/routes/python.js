@@ -26,9 +26,6 @@ router.route('/tool2')
 	await python.stdout.on('data',  (data) => {
 		largeDataSet.push(data);
 		var dataaaa = largeDataSet.join("")
-		
-		dataaaa = dataaaa.substring(1,dataaaa.length-3).split(",")
-		dataaaa[0].replace("\'","aa")
 		//console.log(dataaaa[0])
 
 		res.json({message:dataaaa})

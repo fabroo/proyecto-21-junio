@@ -8,6 +8,7 @@ const User = require('../models/User');
 const multer = require('multer');
 const fs = require('fs');
 const Path = require('path');
+const zip = require('express-zip');
 const { spawn } = require('child_process');
 
 
@@ -88,8 +89,20 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
     res.json({ cantidad: users.cantidadFotos })
 })
 userRouter.get('/download/:companyid', async (req, res) => {
-    var companyid = req.params.companyid
-    res.download('./pickles/' + '1a2b3c' + '/known_names')
+    const companyid = req.params.companyid
+    var lionelmessi = [
+        {path:'./pickles/' + companyid + '/known_names', name:'known_names'}, 
+        {path:'./pickles/' + companyid +  '/known_faces', name:'known_faces'}]
+    res.zip(lionelmessi);
+    
+})
+
+userRouter.get('/zip/:companyid', async (req, res) => {
+    const dni = req.params.companyid
+    var lionelmessi = [
+        {path:'./pickles/' + dni + '/known_names', name:'known_names'}, 
+        {path:'./pickles/' + dni +  '/known_faces', name:'known_faces'}]
+    res.zip(lionelmessi);
 })
 
 userRouter.post('/wipeFotos/:dni', async (req, res) => {

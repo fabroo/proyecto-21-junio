@@ -11,8 +11,8 @@ const Admin = props => {
 
     let [registradoClass, setRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
     let [noregistradoClass, setNoRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
-    let [add, setAdd] = useState({ style: { display: 'block', margin: 'auto .5rem' } })
     let [loading, isLoading] = useState(false);
+
     useEffect(() => {
         isLoading(true)
 
@@ -41,17 +41,6 @@ const Admin = props => {
         showw()
 
     }, []);
-
-    const showData = () => {
-        AuthService.getData(user.companyID).then(res => {
-            setContent(res.data.sort(function (a, b) {
-                if (a.username < b.username) { return -1; }
-                if (a.username > b.username) { return 1; }
-                return 0;
-            }));
-
-        }, [])
-    }
     const showRegister = (e) => {
         setRegistradoClass({ display: 'none' })
         setNoRegistradoClass({ display: 'block' })
@@ -202,7 +191,7 @@ const Admin = props => {
     return (
         <div className="container" >
             <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
-            <a href={"http://192.168.1.203:5000/user/download/" + user.companyID} className="display-4  text-center"><h2>Dowload</h2></a>
+            <a href={"http://192.168.0.109:5000/user/download/" + user.companyID} className="display-4  text-center"><h2>Dowload</h2></a>
 
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
@@ -270,7 +259,7 @@ const Admin = props => {
                                         <td ><p>{user.dni}</p></td>
                                 <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>):(<p>No creada</p>)}</td>
                                         <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt= {user.username} /> : (<p>no hay :(</p>)}</td>
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.0.109:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt= {user.username} /> : (<p>no hay :(</p>)}</td>
 
                                         <td><p>{user.role}</p></td>
                                         <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
