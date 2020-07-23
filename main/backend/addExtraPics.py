@@ -32,12 +32,12 @@ try:
             image = face_recognition.load_image_file(f'{NEW_FACES}/{name}/{filename}')
             try:
                 encoding = face_recognition.face_encodings(image)[0]
+                new_array.append(encoding) #amigo esta linea estaba afuera del try que onda bue tiraba esa y manqueaba en los comentarios jaja re developer
                 
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{KNOWN_FACES_DIR}/{name}')
             except:
                 pass
 
-            new_array.append(encoding)
 
         pingo = False
         numPics = 0

@@ -44,12 +44,12 @@ const Login = props=>{
                 <h3 id="uwu">Please sign in</h3>
 
                     <label htmlFor="username" className="sr-only">Username: </label>
-                <input type="text" 
+                <input type="number" 
                        name="username" 
                        onChange={onChange}
                         
                        className="form-control m-2 input-login" 
-                       placeholder="Enter Username"/>
+                       placeholder="Enter DNI"/>
                     </div>
                 </div>
                 <div className="row">

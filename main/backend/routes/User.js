@@ -96,6 +96,12 @@ userRouter.get('/download/:companyid', async (req, res) => {
     res.zip(lionelmessi);
     
 })
+userRouter.get('/download/uwu', async (req, res) => {
+  await  fetch('./pickles/1a2b3c/known_names')
+    .then(response => response.text())
+    .then(text => console.log(text))
+    console.log('uwu')
+})
 
 userRouter.get('/zip/:companyid', async (req, res) => {
     const dni = req.params.companyid
@@ -176,9 +182,9 @@ userRouter.post('/addFotos/:dni', async (req, res) => {
 })
 const signToken = userID => {
     return JWT.sign({
-        iss: "NoobCoder",
+        iss: "leo-mattioli",
         sub: userID
-    }, "NoobCoder", { expiresIn: "1h" });
+    }, "leo-mattioli", { expiresIn: "1h" });
 }
 userRouter.put('/register', async (req, res) => {
     const { username, password, dni, companyID, mail } = req.body;

@@ -7,7 +7,7 @@ export default class Lab extends Component {
 
   async componentDidMount() {
 
-    axios.get('http://192.168.0.109:5000/user/imagen').then(res => {
+    axios.get('http://192.168.1.203:5000/user/imagen').then(res => {
 //console.log(res)
         } 
      )

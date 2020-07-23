@@ -42,7 +42,7 @@ const Navbar = props => {
             <>
 
                 {user ? (<div className="hola-usuario " style={{ marginRight: '1rem', display: 'flex', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                    <img className="img-fluid" style={{ width: '40px', borderRadius: '50%' }} src={'http://192.168.0.109:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} />
+                    <img className="img-fluid" style={{ width: '40px', borderRadius: '50%' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} />
                     <p style={{ marginLeft: '.5rem', padding: 0, marginBottom: 0 }}>{user.username}</p>
                 </div>) : (null)}
                 <Link to="/" className="nav-item">
