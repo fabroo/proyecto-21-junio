@@ -91,23 +91,83 @@ userRouter.get('/getFotos/:dni', async (req, res) => {
 userRouter.get('/download/:companyid', async (req, res) => {
     const companyid = req.params.companyid
     var lionelmessi = [
-        {path:'./pickles/' + companyid + '/known_names', name:'known_names'}, 
-        {path:'./pickles/' + companyid +  '/known_faces', name:'known_faces'}]
+        { path: './pickles/' + companyid + '/known_names', name: 'known_names' },
+        { path: './pickles/' + companyid + '/known_faces', name: 'known_faces' }]
     res.zip(lionelmessi);
-    
+
 })
-userRouter.get('/download/uwu', async (req, res) => {
-  await  fetch('./pickles/1a2b3c/known_names')
-    .then(response => response.text())
-    .then(text => console.log(text))
-    console.log('uwu')
+userRouter.get('/known_names/:companyid', async (req, res) => {
+    let companyid = req.params.companyid
+    var largeDataSet = [];
+
+    const python = spawn('python', ['pickle_to_text_names.py', companyid]);
+    await python.stdout.on('data', (data) => {
+
+        largeDataSet.push(data);
+        let rawData = largeDataSet.join("")
+        let edited = rawData.slice(1, rawData.length - 3)
+        let listed = edited.split(',')
+        let final = []
+        listed.forEach(dni =>{
+            final.push(parseInt(dni.trim().slice(1,dni.length-2)))
+        })
+        res.json({ message: final })
+
+    });
+
+})
+userRouter.get('/known_faces/:companyid', async (req, res) => {
+    let companyid = req.params.companyid
+    var largeDataSet = [];
+
+    const python = spawn('python', ['pickle_to_text_faces.py', companyid]);
+    await python.stdout.on('data', (data) => {
+
+        largeDataSet.push(data);
+        let rawData = largeDataSet.join("")
+        let edited = rawData.slice(1, rawData.length - 3)
+        let porArray = edited.split('array')
+        let arrayDeEncodingss = []
+        
+        porArray.forEach(encoding =>{
+            if(encoding.length > 0){
+                arrayDeEncodingss.push(encoding.trim())
+            }
+        })
+        let encoding_bien_format = []
+        arrayDeEncodingss.forEach(arraydeencoding =>{
+            if(arraydeencoding[arraydeencoding.length-1] == ','){
+                let uwu = arraydeencoding.slice(1,arraydeencoding.length-2)
+
+                encoding_bien_format.push(uwu.slice(2,uwu.length-2))
+            }else{
+                encoding_bien_format.push(arraydeencoding.slice(2,arraydeencoding.length-2))
+
+            }
+        })
+        let encodings_correctos = []
+        encoding_bien_format.forEach(encoding =>{
+            let elArray = []
+            let numeros = encoding.split(',')
+            numeros.forEach(numero =>{
+                elArray.push(parseFloat(numero.replace('\r\n','').trim()))
+                
+            })
+            encodings_correctos.push(elArray)
+        })
+
+
+        res.json({ message: encodings_correctos     })
+
+    });
+
 })
 
 userRouter.get('/zip/:companyid', async (req, res) => {
     const dni = req.params.companyid
     var lionelmessi = [
-        {path:'./pickles/' + dni + '/known_names', name:'known_names'}, 
-        {path:'./pickles/' + dni +  '/known_faces', name:'known_faces'}]
+        { path: './pickles/' + dni + '/known_names', name: 'known_names' },
+        { path: './pickles/' + dni + '/known_faces', name: 'known_faces' }]
     res.zip(lionelmessi);
 })
 
