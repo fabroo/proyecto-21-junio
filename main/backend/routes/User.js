@@ -15,13 +15,13 @@ const { spawn } = require('child_process');
 
 userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
-    res.json(users)
+    return res.json(users)
 
 
 })
 userRouter.get('/mod', async (req, res) => {
     const users = await UserNew.find()
-    res.json(users)
+    return res.json(users)
 
 
 })
@@ -31,12 +31,12 @@ userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
 
     try {
         fs.access(`.\\users\\${companyid}\\${dni}\\${dni}.png`, fs.F_OK, (err) => {
-            res.sendFile(`\\users\\${companyid}\\${dni}\\${dni}.png`, { root: '.' })
+            return res.sendFile(`\\users\\${companyid}\\${dni}\\${dni}.png`, { root: '.' })
         })
     }
     catch{
         fs.access(`.\\users\\${companyid}\\${dni}.jpg`, fs.F_OK, (err) => {
-            res.sendFile(`\\users\\${companyid}\\${dni}.jpg`, { root: '.' })
+            return res.sendFile(`\\users\\${companyid}\\${dni}.jpg`, { root: '.' })
         })
     }
 
@@ -47,17 +47,17 @@ userRouter.post('/registerNew', (req, res) => {
     const { dni, companyID, role, username } = req.body;
     UserNew.findOne({ dni }, (err, user) => {
         if (err)
-            res.json({ message: { msgBody: "Error has occured", msgError: true } });
+            return res.json({ message: { msgBody: "Error has occured", msgError: true } });
         if (user)
-            res.json({ message: { msgBody: "Username is already taken", msgError: true } });
+            return res.json({ message: { msgBody: "Username is already taken", msgError: true } });
         else {
             const newUser = new UserNew({ username, dni, companyID, role });
             newUser.save(err => {
                 if (err) {
-                    res.json({ message: { msgBody: "Error has occured", msgError: true } });
+                    return res.json({ message: { msgBody: "Error has occured", msgError: true } });
                 }
                 else
-                    res.status(201).json({ message: { msgBody: "Account successfully created", msgError: false } });
+                    return res.status(201).json({ message: { msgBody: "Account successfully created", msgError: false } });
             });
         }
     });
@@ -66,7 +66,7 @@ userRouter.post('/registerNew', (req, res) => {
 userRouter.get('/users/:compid', async (req, res) => {
     const id = req.params.compid;
     const users = await UserNew.find({ companyID: id })
-    res.json(users)
+    return res.json(users)
 })
 userRouter.get('/delete/:_id', async (req, res) => {
     const id = req.params._id;
@@ -93,73 +93,74 @@ userRouter.get('/download/:companyid', async (req, res) => {
     var lionelmessi = [
         { path: './pickles/' + companyid + '/known_names', name: 'known_names' },
         { path: './pickles/' + companyid + '/known_faces', name: 'known_faces' }]
-        return res.zip(lionelmessi);
+    return res.zip(lionelmessi);
 
 })
-userRouter.get('/known_names/:companyid', async (req, res) => {
-    let companyid = req.params.companyid
-    var largeDataSet = [];
 
-    const python = spawn('python', ['pickle_to_text_names.py', companyid]);
-    await python.stdout.on('data', (data) => {
-
-        largeDataSet.push(data);
-        let rawData = largeDataSet.join("")
-        let edited = rawData.slice(1, rawData.length - 3)
-        let listed = edited.split(',')
-        let final = []
-        listed.forEach(dni =>{
-            final.push(parseInt(dni.trim().slice(1,dni.length-2)))
-        })
-        return        res.json({ message: final })
-
-    });
-
-})
-userRouter.get('/known_faces/:companyid', async (req, res) => {
+userRouter.get('/get_data/:companyid', async (req, res) => {
     let companyid = req.params.companyid
     var largeDataSet = [];
 
     const python = spawn('python', ['pickle_to_text_faces.py', companyid]);
-    await python.stdout.on('data', (data) => {
+    console.log('afuera')
 
+    await python.stdout.on('data', async (data) => {
+        console.log('adentro faces')
         largeDataSet.push(data);
+
+    });
+    await python.stdout.on('close', async code => {
         let rawData = largeDataSet.join("")
         let edited = rawData.slice(1, rawData.length - 3)
         let porArray = edited.split('array')
         let arrayDeEncodingss = []
-        
-        porArray.forEach(encoding =>{
-            if(encoding.length > 0){
+
+        porArray.forEach(encoding => {
+            if (encoding.length > 0) {
                 arrayDeEncodingss.push(encoding.trim())
             }
         })
         let encoding_bien_format = []
-        arrayDeEncodingss.forEach(arraydeencoding =>{
-            if(arraydeencoding[arraydeencoding.length-1] == ','){
-                let uwu = arraydeencoding.slice(1,arraydeencoding.length-2)
+        arrayDeEncodingss.forEach(arraydeencoding => {
+            if (arraydeencoding[arraydeencoding.length - 1] == ',') {
+                let uwu = arraydeencoding.slice(1, arraydeencoding.length - 2)
 
-                encoding_bien_format.push(uwu.slice(2,uwu.length-2))
-            }else{
-                encoding_bien_format.push(arraydeencoding.slice(2,arraydeencoding.length-2))
+                encoding_bien_format.push(uwu.slice(2, uwu.length - 2))
+            } else {
+                encoding_bien_format.push(arraydeencoding.slice(2, arraydeencoding.length - 2))
 
             }
         })
         let encodings_correctos = []
-        encoding_bien_format.forEach(encoding =>{
+        encoding_bien_format.forEach(encoding => {
             let elArray = []
             let numeros = encoding.split(',')
-            numeros.forEach(numero =>{
-                elArray.push(parseFloat(numero.replace('\r\n','').trim()))
-                
+            numeros.forEach(numero => {
+                elArray.push(parseFloat(numero.replace('\r\n', '').trim()))
+
             })
             encodings_correctos.push(elArray)
         })
+        var laData = [];
 
+        const python1 = spawn('python', ['pickle_to_text_names.py', companyid]);
+        await python1.stdout.on('data', (data) => {
+            console.log('adentro names')
+            laData.push(data);
 
-        return res.json({ message: encodings_correctos     })
+        });
+        await python1.stdout.on('close', async code => {
+            let rawData = laData.join("")
+            let edited = rawData.slice(1, rawData.length - 3)
+            let listed = edited.split(',')
+            let final = []
+            listed.forEach(dni => {
+                final.push(parseInt(dni.trim().slice(1, dni.length - 2)))
+            })
 
-    });
+            return res.json({ names: final, faces: encodings_correctos })
+        })
+    })
 
 })
 
@@ -569,10 +570,10 @@ userRouter.post('/uploadPfp', async function (req, res) {
 
 userRouter.get('/admin', passport.authenticate('jwt', { session: false }), (req, res) => {
     if (req.user.role === 'admin') {
-        res.status(200).json({ message: { msgBody: 'You are an admin', msgError: false } });
+        return res.status(200).json({ message: { msgBody: 'You are an admin', msgError: false } });
     }
     else
-        res.status(403).json({ message: { msgBody: "You're not an admin,go away", msgError: true } });
+        return res.status(403).json({ message: { msgBody: "You're not an admin,go away", msgError: true } });
 });
 
 userRouter.get('/authenticated', passport.authenticate('jwt', { session: false }), (req, res) => {
