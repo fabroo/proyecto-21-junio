@@ -46,7 +46,7 @@ try:
 
     END = time.time() #the code ends here
     #total time
-    data ='Terminado en ' + str(int(END - START)) + ' segundos! Feliz cumple. DNI:'
+    data ='Terminado en ' + str(int(END - START)) + ' segundos!'
     print(data)
 except Exception as ex:
     print("Err: " + ex)

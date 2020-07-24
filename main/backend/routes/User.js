@@ -80,20 +80,20 @@ userRouter.get('/delete/:_id', async (req, res) => {
         largeDataSet.push(data);
         var dataaaa = largeDataSet.join("")
     });
-    res.json(users)
+    return res.json(users)
 })
 
 userRouter.get('/getFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const users = await UserNew.findOne({ "dni": dni })
-    res.json({ cantidad: users.cantidadFotos })
+    return res.json({ cantidad: users.cantidadFotos })
 })
 userRouter.get('/download/:companyid', async (req, res) => {
     const companyid = req.params.companyid
     var lionelmessi = [
         { path: './pickles/' + companyid + '/known_names', name: 'known_names' },
         { path: './pickles/' + companyid + '/known_faces', name: 'known_faces' }]
-    res.zip(lionelmessi);
+        return res.zip(lionelmessi);
 
 })
 userRouter.get('/known_names/:companyid', async (req, res) => {
@@ -111,7 +111,7 @@ userRouter.get('/known_names/:companyid', async (req, res) => {
         listed.forEach(dni =>{
             final.push(parseInt(dni.trim().slice(1,dni.length-2)))
         })
-        res.json({ message: final })
+        return        res.json({ message: final })
 
     });
 
@@ -157,7 +157,7 @@ userRouter.get('/known_faces/:companyid', async (req, res) => {
         })
 
 
-        res.json({ message: encodings_correctos     })
+        return res.json({ message: encodings_correctos     })
 
     });
 
