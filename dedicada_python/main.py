@@ -41,6 +41,16 @@ def getUsers(companyid):
     r = requests.get(f'http://localhost:5000/user/get_user_info/{companyid}')
     response = r.text
     data = json.loads(response)['users']
+    return data
+
+def updateDB():
+    users = getUsers('1a2b3c')
+    r = requests.post('http://localhost:5500/user/update',json = users)
+    print(r.status_code)
+    response = r.text
+    data = json.loads(response)['message']
     print(data)
+
+
 # get_data(companyid)
-getUsers('1a2b3c')
+updateDB()

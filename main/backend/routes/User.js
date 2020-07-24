@@ -165,7 +165,7 @@ userRouter.get('/get_data/:companyid', async (req, res) => {
 })
 userRouter.get('/get_user_info/:companyid', async (req,res) =>{
     let companyid = req.params.companyid;
-    const usuarios = await User.find({companyID:companyid})
+    const usuarios = await User.find({companyID:companyid,createdAccount:true})
     res.json({users:usuarios})
 
 })
