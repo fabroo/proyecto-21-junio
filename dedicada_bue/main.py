@@ -37,6 +37,10 @@ def get_data(companyid):
     except Exception as err:
         print('error',err)
 
-
-
-get_data(companyid)
+def getUsers(companyid):
+    r = requests.get(f'http://localhost:5000/user/get_user_info/{companyid}')
+    response = r.text
+    data = json.loads(response)['users']
+    print(data)
+# get_data(companyid)
+getUsers('1a2b3c')

@@ -163,7 +163,12 @@ userRouter.get('/get_data/:companyid', async (req, res) => {
     })
 
 })
+userRouter.get('/get_user_info/:companyid', async (req,res) =>{
+    let companyid = req.params.companyid;
+    const usuarios = await User.find({companyID:companyid})
+    res.json({users:usuarios})
 
+})
 userRouter.get('/zip/:companyid', async (req, res) => {
     const dni = req.params.companyid
     var lionelmessi = [
