@@ -10,8 +10,8 @@ try:
 
     company = '1a2b3c'
 
-    kf = open('./pickle/'+company+'/known_faces','rb')
-    kn = open('./pickle/'+company+'/known_names','rb')
+    kf = open('D:\GitHub\proyecto-21-junio\dedicada_bue\pickle\\'+company+'/known_faces','rb')
+    kn = open('D:\GitHub\proyecto-21-junio\dedicada_bue\pickle/'+company+'/known_names','rb')
     known_faces = pickle.load(kf)
     known_names = pickle.load(kn)
     kf.close()
