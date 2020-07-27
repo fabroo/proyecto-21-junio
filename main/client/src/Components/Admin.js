@@ -5,34 +5,41 @@ import swal from 'sweetalert';
 
 const Admin = props => {
 
+    //actual user
     const { user } = useContext(AuthContext);
-    let [content, setContent] = useState(null)
-    let [elinput, setElInput] = useState({ dni: 0, role: "user", username: "" })
 
+
+    let [content, setContent] = useState(null) //list of company users
+    let [elinput, setElInput] = useState({ dni: 0, role: "user" }) //create new company user 
+
+    //button classes
     let [registradoClass, setRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
     let [noregistradoClass, setNoRegistradoClass] = useState({ style: { display: 'none', margin: 'auto .5rem' } })
-    let [loading, isLoading] = useState(false);
 
-    useEffect(() => {
-        isLoading(true)
+    let [loading, isLoading] = useState(false); //loading message
+
+    useEffect(() => { //fetch user list at the beggining
+
+        isLoading(true) //begin to load
 
         async function showw() {
             AuthService.getData(user.companyID).then(res => {
+                //consts
                 const all = res.data;
                 const users = [];
-    
-                all.map(user => {
+
+                all.map(user => { //only display registered users
                     if (user.createdAccount) {
                         users.push(user)
                     }
                 })
-    
-                setContent(users.sort(function (a, b) {
+
+                setContent(users.sort(function (a, b) { //sort users alphabetically
                     if (a.username < b.username) { return -1; }
                     if (a.username > b.username) { return 1; }
                     return 0;
                 }));
-                isLoading(false)
+                isLoading(false) //done loading
 
                 setRegistradoClass({ display: 'block' })
                 setNoRegistradoClass({ display: 'block' })
@@ -41,20 +48,32 @@ const Admin = props => {
         showw()
 
     }, []);
-    const showRegister = (e) => {
-        setRegistradoClass({ display: 'none' })
-        setNoRegistradoClass({ display: 'block' })
 
+    const showWich = (yesOrNo) => { //only users depending if they are registered or not
+        if (yesOrNo) { //set the button classes
+            setRegistradoClass({ display: 'none' })
+            setNoRegistradoClass({ display: 'block' })
+        } else {
+            setRegistradoClass({ display: 'block' })
+            setNoRegistradoClass({ display: 'none' })
+        }
+        //get company users
         AuthService.getData(user.companyID).then(res => {
             const all = res.data;
             const users = [];
 
             all.map(user => {
-                if (user.createdAccount) {
-                    users.push(user)
+                if (yesOrNo) {
+                    if (user.createdAccount) {
+                        users.push(user)
+                    }
+                } else {
+                    if (!user.createdAccount) {
+                        users.push(user)
+                    }
                 }
             })
-
+            //sort them
             setContent(users.sort(function (a, b) {
                 if (a.username < b.username) { return -1; }
                 if (a.username > b.username) { return 1; }
@@ -62,33 +81,9 @@ const Admin = props => {
             }));
         }, [])
     }
-    const showUnRegister = (e) => {
-        setRegistradoClass({ display: 'block' })
-        setNoRegistradoClass({ display: 'none' })
-        AuthService.getData(user.companyID).then(res => {
-            const all = res.data;
-            const users = [];
-
-            all.map(user => {
-                if (!user.createdAccount) {
-                    users.push(user)
-                }
-            })
-            if (users.length === 0) {
-                swal('No hay sin registrarse')
-            }
-            else {
-                setContent(users.sort(function (a, b) {
-                    if (a.username < b.username) { return -1; }
-                    if (a.username > b.username) { return 1; }
-                    return 0;
-                }));
-            }
-        }, [])
-
-    }
+    //delete users
     const chau = (dni) => {
-        swal("Estas seguro de ello? No podras volver atrás", {
+        swal("Estas seguro de ello? No podras volver atrás", { //ask for second thoughts uwu
             buttons: {
                 cancel: "Cancelar",
                 catch: {
@@ -102,8 +97,8 @@ const Admin = props => {
 
                     case "borrar":
                         swal("Eliminado", "El trabajador no forma mas parte de la empresa", "success");
-                        AuthService.removeUser(dni).then(res => {
-                            showRegister()
+                        AuthService.removeUser(dni).then(res => { //remove function
+                            showWich(true);
                         }, [])
                         break;
 
@@ -112,29 +107,31 @@ const Admin = props => {
                 }
             });
     }
+    //create new user
     const registrarNuevo = async () => {
+        //user data
         const dni = elinput.dni;
         const role = elinput.role;
-        const username = String(dni);
+        const username = String(dni); //until the user creates his account the username will be his DNI
         const companyid = user.companyID
-        
-        
+
+
         await AuthService.registerNew({ dni: dni, companyID: user.companyID, role: role, username: username, companyid: companyid }).then(res => {
-            swal('Error!',res.data.message.msgBody)
+            !res.data.message.msgError ? (swal('Nice!', res.data.message.msgBody)) : (swal('Error!', res.data.message.msgBody))
         }, [])
 
-        showUnRegister()
+        showWich(false)
 
     }
-    const download = () => {
+    const download = () => { //download company pickle
         AuthService.downloadP(user.companyID).then(res => {
             download(res)
         })
     }
-    const handleChange = (e) => {
+    const handleChange = (e) => { //handle the create user input
         setElInput({ ...elinput, [e.target.name]: e.target.value });
     }
-    const wipeFotos = async (user) => {
+    const wipeFotos = async (user) => { //eliminar los datos del usuario en el pickle
         let dni = user.dni
         let companyID = user.companyID
         if (user.cantidadFotos > 0 && user.createdAccount) {
@@ -187,7 +184,7 @@ const Admin = props => {
             })
         }
     }
-    
+
     return (
         <div className="container" >
             <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
@@ -195,13 +192,11 @@ const Admin = props => {
 
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
-                    <button className="btn btn-primary m-2 none" style={registradoClass} onClick={showRegister}>REGISTRADOS</button>
-                    <button className="btn btn-secondary m-2 none" style={noregistradoClass} onClick={showUnRegister}>NO REGISTRADOS</button>
-                    <button  type="button" className="btn btn-info m-2" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
+                    <button className="btn btn-primary m-2 none" style={registradoClass} onClick={() => showWich(true)}>REGISTRADOS</button>
+                    <button className="btn btn-secondary m-2 none" style={noregistradoClass} onClick={() => showWich(false)}>NO REGISTRADOS</button>
+                    <button type="button" className="btn btn-info m-2" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
 
                 </div>
-                {/* <button className="btn btn-info">+</button> */}
-
                 <div className="modal fade" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
@@ -236,7 +231,6 @@ const Admin = props => {
             </div>
             {!loading ? (
                 <div>
-
                     <table className="table table-hover text-center table-responsive-lg">
                         <thead className="thead-dark">
                             <tr>
@@ -257,9 +251,9 @@ const Admin = props => {
 
                                         <td>{!user.createdAccount ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
                                         <td ><p>{user.dni}</p></td>
-                                <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>):(<p>No creada</p>)}</td>
+                                        <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>) : (<p>No creada</p>)}</td>
                                         <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt= {user.username} /> : (<p>no hay :(</p>)}</td>
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no hay :(</p>)}</td>
 
                                         <td><p>{user.role}</p></td>
                                         <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>
@@ -271,11 +265,7 @@ const Admin = props => {
                         </tbody>
                     </table>
                 </div>
-            ) : (<h1>loading</h1>)}
-
-            <br />
-            <br />
-
+            ) : (<h1>It is loading!</h1>)}
         </div>
 
     )
