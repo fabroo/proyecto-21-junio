@@ -4,12 +4,15 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
+const dnname = 'test'
+const uri = `mongodb+srv://root:rootroot@test.0vjrm.mongodb.net/${dnname}?retryWrites=true&w=majority`
 app.use(express.static(path.join(__dirname, 'client/build')))
 
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors());
-mongoose.connect('mongodb://localhost:27017/mernauth',{useNewUrlParser : true,useUnifiedTopology: true,useCreateIndex:true},()=>{
+//'mongodb://localhost:27017/mernauth'
+mongoose.connect(uri,{useNewUrlParser : true,useUnifiedTopology: true,useCreateIndex:true},()=>{
     console.log('successfully connected to database');
 });
 

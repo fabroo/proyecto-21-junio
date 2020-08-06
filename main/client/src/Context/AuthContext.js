@@ -30,7 +30,7 @@ export default ({ children }) => {
 
     return (
         <div>
-            {isLoaded ?
+            {!isLoaded ?
                 <div >
                     <div style={{ display: "table", height: "100vh", width: "100vw", textAlign: "center",overflowY:'hidden', overflow: "hidden" }}>
                         <div style={{ display: "table-cell", "verticalAlign": "middle" }}>
