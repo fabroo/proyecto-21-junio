@@ -16,8 +16,10 @@ const { spawn } = require('child_process');
 userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     return res.json(users)
+})
 
-
+userRouter.get('/hola', async (req, res) => {
+    return res.send('hola mundooo')
 })
 userRouter.get('/mod', async (req, res) => {
     const users = await UserNew.find()
