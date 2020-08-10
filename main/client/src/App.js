@@ -22,8 +22,6 @@ function App() {
       <PrivateRoute path="/admin" roles={["admin","mod"]} component={Admin}/>
       <PrivateRoute path="/mod" roles={["mod"]} component={Mod}/>
       <PrivateRoute path="/upload" roles={["user","admin","mod"]} component={Upload}/>
-      
-      {/* <Footer/> */}
     </Router>
     
 
