@@ -5,7 +5,6 @@ import Message from '../Components/Message';
 
 const Python = props=>{
     const [user,setLink] = useState({link:""});
-    const [url,setUrl] = useState({url:""});
     const [message,setMessage] = useState(null);
 
 
@@ -19,7 +18,6 @@ const Python = props=>{
         e.preventDefault();
         AuthService.postPython(user).then(data=>{
             //console.log(data)
-            setUrl({url:((data).data.message)})
             let yes = ((data).data.message)
             setMessage({msgBody:"el link es: "+ yes})
             resetForm();

@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
 import { AuthContext } from '../Context/AuthContext';
-import Python from '../Services/postPython'
 import { Link } from 'react-router-dom'
 import Brenda from '../photos/brenda.jpg'
 import Fabro from '../photos/fabro.jpg'

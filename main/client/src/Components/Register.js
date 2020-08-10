@@ -7,7 +7,6 @@ const Register = props => {
     const [user, setUser] = useState({ username: "", password: "", dni: "", companyID: "", mail: "" });
     const [message, setMessage] = useState(null);
     const [picture, setPicture] = useState(null);
-    const [fotos, setFotos] = useState({ cantidad: 0 })
     let timerID = useRef(null);
 
     useEffect(() => {
@@ -17,10 +16,7 @@ const Register = props => {
     }, []);
 
     const onChangeHandler = (e) => {
-
         setPicture(e.target.files)
-        setFotos({ cantidad: e.target.files.length })
-
     }
     const onClickHandler = () => {
         const data = new FormData()

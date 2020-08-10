@@ -28,7 +28,7 @@ const Admin = props => {
                 const all = res.data;
                 const users = [];
 
-                all.map(user => { //only display registered users
+                all.forEach(user => { //only display registered users
                     if (user.createdAccount) {
                         users.push(user)
                     }
@@ -47,7 +47,7 @@ const Admin = props => {
         }
         showw()
 
-    }, []);
+    }, [user.companyID]); //si se rompe saca lo de aca adentro
 
     const showWich = (yesOrNo) => { //only users depending if they are registered or not
         if (yesOrNo) { //set the button classes
@@ -62,7 +62,7 @@ const Admin = props => {
             const all = res.data;
             const users = [];
 
-            all.map(user => {
+            all.forEach(user => {
                 if (yesOrNo) {
                     if (user.createdAccount) {
                         users.push(user)
@@ -123,11 +123,7 @@ const Admin = props => {
         showWich(false)
 
     }
-    const download = () => { //download company pickle
-        AuthService.downloadP(user.companyID).then(res => {
-            download(res)
-        })
-    }
+
     const handleChange = (e) => { //handle the create user input
         setElInput({ ...elinput, [e.target.name]: e.target.value });
     }
@@ -156,7 +152,7 @@ const Admin = props => {
                                 const all = res.data;
                                 const users = [];
 
-                                all.map(user => {
+                                all.forEach(user => {
                                     if (user.createdAccount) {
                                         users.push(user)
                                     }

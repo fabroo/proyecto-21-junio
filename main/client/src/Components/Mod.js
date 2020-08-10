@@ -1,5 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
-import { AuthContext } from '../Context/AuthContext';
+import React, { useState, useEffect } from 'react'
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
 
@@ -7,11 +6,10 @@ const Admin = props => {
     const [search, setSearch] = useState("");
     let [elinput, setElInput] = useState({ dni: 0, comapnyid: "", role: "user", username: "" })
     let [loading, isLoading] = useState(false)
-    let [newDict, setNewDict] = useState({})
+
     const handleInput = e => {
         setSearch(e.target.value);
     };
-    const { user } = useContext(AuthContext);
 
     let [content, setContent] = useState(null)
     let [contenido, setContenido] = useState(null)
@@ -34,16 +32,10 @@ const Admin = props => {
                 setContenido(contendio);
 
                 isLoading(false)
-                rearrange(contendio)
             }, [])
-
         }
-
         showw()
-
-
     }, []);
-
 
     const searchh = (e) => {
         if (content) {
@@ -110,35 +102,7 @@ const Admin = props => {
 
         }, [])
     }
-    const rearrange = (contenidoo) => {
-        //console.log('contee', contenidoo)
-        var newDict = {}
-        var users = []
-        if (contenidoo) {
-            let companyid = ""
-            for (let i = 0; i < contenidoo.length; i++) {
-                if (contenidoo[i].companyID !== companyid) {
 
-                    companyid = contenidoo[i].companyID
-                    users.push(contenidoo[i])
-                    //console.log(newDict[companyid])
-
-                    if (users) {
-                        newDict[contenidoo[i].companyID] = users
-                        users = []
-                    } else {
-                        users.push(contenidoo[i])
-                    }
-
-                }
-                else {
-                    users.push(contenidoo[i])
-                }
-            }
-        }
-        //console.log('dict', newDict)
-        setNewDict(newDict)
-    }
     return (
         <div className="container" >
             <div className="m-2 arriba d-flex flex-row-reverse">
@@ -198,8 +162,6 @@ const Admin = props => {
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
-
-
                     </div>
                 </div>
             </div>
@@ -224,27 +186,22 @@ const Admin = props => {
                                 <tbody>
 
                                     <tr key={user._id}>
-
                                         <td>{!user.createdAccount ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
                                         <td ><p>{user.dni}</p></td>
                                         <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>) : (<p>no creada</p>)}</td>
                                         <td> {user.createdAccount ? (!user.modeloEntrenado ? <p>no</p> : <p>si</p>) : (<p>no creada</p>)}</td>
                                         <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no creada</p>)}</td>
-
                                         <td><p>{user.role}</p></td>
                                         <td><p>{user.companyID}</p></td>
                                         <td><p >{user.createdAccount ? (user.cantidadFotos) : (<p>no creada</p>)}</p></td>
-
                                         <td> {user.role !== "mod" ? (<button className="btn btn-danger" onClick={() => chau(user._id)} >X</button>) : (<p>es mod bro</p>)} </td>
                                     </tr>
                                 </tbody>
                             </table>
                         )
-
                     ) : (<tr><td>No content...</td></tr>)}
                 </div>
             ) : (<h1>loading</h1>)}
-
             <br />
             <br />
         </div>
