@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema({
         type: String
     },
     password: {
-        type: String,
+        type: String //le saque una coma aca
     },
     role: {
         type: String,
