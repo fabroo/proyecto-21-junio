@@ -13,7 +13,6 @@ import {BrowserRouter as Router, Route} from 'react-router-dom';
 function App() {
   return (
     <Router>
-      
       <Navbar/>
       <Route exact path="/" component={Home}/>
       <UnPrivateRoute path="/login" component={Login}/>
@@ -22,8 +21,6 @@ function App() {
       <PrivateRoute path="/mod" roles={["mod"]} component={Mod}/>
       <PrivateRoute path="/upload" roles={["user","admin","mod"]} component={Upload}/>
     </Router>
-    
-
   );
 }
 
