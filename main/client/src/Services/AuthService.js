@@ -1,5 +1,5 @@
 import axios from 'axios'
-const ip = "192.168.1.203"
+const ip = "100.24.63.94"
 
 export default {
     login: user => {
@@ -18,11 +18,11 @@ export default {
     },
     register: async user => {
 
-        return await axios.put('http://' + ip + ':5000/user/register', user)
+        return await axios.put('http://' + ip + '/user/register', user)
             .then(res => res)
     },
     registerNew: async user => {
-        return await axios.post('http://' + ip + ':5000/user/registerNew', user)
+        return await axios.post('http://' + ip + '/user/registerNew', user)
             .then(res => res)
     },
     
@@ -33,53 +33,53 @@ export default {
     },
     getData: async (companyid) => {
         //cambiar con la ip de tu casa
-        return await axios.get('http://' + ip + ':5000/user/users/' + companyid)
+        return await axios.get('http://' + ip + '/user/users/' + companyid)
             .then(res => res)
 
     },
     
     downloadP: async (companyid) => {
         //cambiar con la ip de tu casa
-        return await axios.get('http://' + ip + ':5000/user/download/' + companyid)
+        return await axios.get('http://' + ip + '/user/download/' + companyid)
             .then(res => res)
 
     },
     
     getMod: async () => {
         //cambiar con la ip de tu casa
-        return await axios.get('http://' + ip + ':5000/user/mod')
+        return await axios.get('http://' + ip + '/user/mod')
             .then(res => res)
 
     },
     upload: async (data, user,companyid,dni) => {
-        return await axios.post('http://' + ip + ':5000/user/upload/'+companyid+'/'+dni, data)
+        return await axios.post('http://' + ip + '/user/upload/'+companyid+'/'+dni, data)
             .then(res => res)
 
     },
 
     uploadPfp: async (data, user) => {
-        return await axios.post('http://' + ip + ':5000/user/uploadPfp/', data)
+        return await axios.post('http://' + ip + '/user/uploadPfp/', data)
             .then(res => res)
 
     },
     removeUser: async (id) => {
         //cambiar con la ip de tu casa
-        return await axios.get('http://' + ip + ':5000/user/delete/' + id)
+        return await axios.get('http://' + ip + '/user/delete/' + id)
             .then(res => res)
 
     },
     getFotos: async (dni) => {
-        return await axios.get('http://' + ip + ':5000/user/getFotos/' + dni)
+        return await axios.get('http://' + ip + '/user/getFotos/' + dni)
             .then(res => res)
 
     },
     wipeFotos: async (dni, companyid) => {
-        return await axios.post('http://' + ip + ':5000/user/wipeFotos/' + dni, { companyid })
+        return await axios.post('http://' + ip + '/user/wipeFotos/' + dni, { companyid })
             .then(res => res)
 
     },
     addFotos: async (dni, cantidad) => {
-        return await axios.post('http://' + ip + ':5000/user/addFotos/' + dni, cantidad)
+        return await axios.post('http://' + ip + '/user/addFotos/' + dni, cantidad)
             .then(res => res)
 
     },
@@ -93,7 +93,7 @@ export default {
             });
     }, postPython: async (link) => {
         //cambiar con la ip de tu casa
-        return await axios.post('http://' + ip + ':5000/python', link)
+        return await axios.post('http://' + ip + '/python', link)
             .then(res => res)
     }
 
