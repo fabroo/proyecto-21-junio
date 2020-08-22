@@ -165,10 +165,10 @@ userRouter.get('/get_data/:companyid', async (req, res) => {
     })
 
 })
-userRouter.get('/get_user_info/:companyid', async (req,res) =>{
+userRouter.get('/get_user_info/:companyid', async (req, res) => {
     let companyid = req.params.companyid;
-    const usuarios = await User.find({companyID:companyid,createdAccount:true})
-    res.json({users:usuarios})
+    const usuarios = await User.find({ companyID: companyid, createdAccount: true })
+    res.json({ users: usuarios })
 
 })
 userRouter.get('/zip/:companyid', async (req, res) => {
@@ -377,11 +377,13 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
             var largeDataSet = [];
             console.log("addnewPics")
             python = spawn('python', ['addExtraPics.py', req.params.dni, req.params.companyid])
+            
             await python.stdout.on('data', (data) => {
                 console.log('adentro funco add pics')
                 largeDataSet.push(data);
                 res.json({ message: largeDataSet.join("") })
             });
+
             await python.stdout.on('close', async (code) => {
                 console.log('final')
                 var check_result = [];
@@ -396,6 +398,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                 await python.stdout.on('close', async code => {
                     const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
                     arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
+                    console.log('arr',arr)
                     arr.forEach((user) => {
                         var user1 = user.trim()
                         var user2 = user1.slice(1, user1.length - 1)
@@ -406,6 +409,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                         doc.cantidadFotos = numberOfOccurrencies;
                         doc.save();
                     });
+
                 })
             });
 
@@ -425,6 +429,7 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                         //ACA YA SE AGREGAN NUEVAS COSAS AL PICKLE
                         var dni = req.params.dni;
                         console.log('adentro train bien')
+
                         await UserNew.findOne({ dni: dni }, function (err, doc) {
                             doc.modeloEntrenado = true;
                             doc.save();

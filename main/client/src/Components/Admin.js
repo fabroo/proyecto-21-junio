@@ -249,7 +249,7 @@ const Admin = props => {
                                         <td ><p>{user.dni}</p></td>
                                         <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>) : (<p>No creada</p>)}</td>
                                         <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no hay :(</p>)}</td>
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px',height:'100px',objectFit:'cover' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no hay :(</p>)}</td>
 
                                         <td><p>{user.role}</p></td>
                                         <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>

@@ -25,7 +25,9 @@ try:
 
     NEW_FACES= './fotitos/'+company
 
-
+    original = 0
+    orignal2 = 0
+    #ESTABA TO_DO ADENTRO DEL FOR
     for name in os.listdir(NEW_FACES):
         
         for filename in os.listdir(f'{NEW_FACES}/{name}'):
@@ -34,36 +36,41 @@ try:
                 encoding = face_recognition.face_encodings(image)[0]
                 new_array.append(encoding) #amigo esta linea estaba afuera del try que onda bue tiraba esa y manqueaba en los comentarios jaja re developer
                 
+                original = len(new_array)
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{KNOWN_FACES_DIR}/{name}')
             except:
                 pass
+        # n encodings nuevos
+    pingo = False
+    numPics = 0
+    numAppear = 0
+    for i in range(len(known_names)):
+        if known_names[i] == DESIGNATED_NAME:
+            numPics += 1
+            if not pingo:
+                numAppear = i
+                pingo = True
+    elNumero = numAppear + numPics
+    original2 = len(new_array)
 
 
-        pingo = False
-        numPics = 0
-        numAppear = 0
-        for i in range(len(known_names)):
-            if known_names[i] == DESIGNATED_NAME:
-                numPics += 1
-                if not pingo:
-                    numAppear = i
-                    pingo = True
+    hol1 = known_names
 
-        elNumero = numAppear + numPics
-        for i in range(len(new_array)):
-            y = i + elNumero
-            known_faces.insert(y, new_array[i])
-            known_names.insert(y, DESIGNATED_NAME)
-        
-        f = open('./pickles/'+company+'/known_faces','wb')
-        n = open('./pickles/'+company+'/known_names','wb')
-        newFaces = pickle.dump(known_faces,f, pickle.HIGHEST_PROTOCOL)
-        newNames = pickle.dump(known_names,n, pickle.HIGHEST_PROTOCOL)
-        f.close()
-        n.close()
+    for k in range(len(new_array)):
+        y = k + elNumero
+        known_faces.insert(y, new_array[k])
+        known_names.insert(y, DESIGNATED_NAME)
+
+
+    f = open('./pickles/'+company+'/known_faces','wb')
+    n = open('./pickles/'+company+'/known_names','wb')
+    pickle.dump(known_faces,f, pickle.HIGHEST_PROTOCOL)
+    pickle.dump(known_names,n, pickle.HIGHEST_PROTOCOL)
+    f.close()
+    n.close()
 
     END = time.time()
-    print('tardo ' + str(int(END - START)) + ' segundos (aprox uwu) en procesar.')
+    print('tardo ' + str(int(END - START)+2) + ' segundos (aprox uwu) checkpoint1: ' + str(hol1) + " checkpoint 2: " +str(known_names))
 
 except Exception as err:
     print(err)

@@ -41,10 +41,6 @@ const Navbar = props => {
         return (
             <>
 
-                {user ? (<div className="hola-usuario " style={{ marginRight: '1rem', display: 'flex', textAlign: 'center', justifyContent: 'center', alignItems: 'center' }}>
-                    <img className="img-fluid" style={{ width: '50px',height:'50px',objectFit:'cover', borderRadius: '50%' }} src={'http://192.168.1.203:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} />
-                    <p style={{ marginLeft: '.5rem', padding: 0, marginBottom: 0 }}>{user.username}</p>
-                </div>) : (null)}
                 <Link to="/" className="nav-item">
                     <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Home
@@ -90,7 +86,7 @@ const Navbar = props => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light">
             <Link to="/" className="nav-item">
-                <div className="navbar-brand">Leo Mattioli</div>
+                <div className="navbar-brand">Lurien</div>
             </Link>
 
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
