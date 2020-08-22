@@ -1,5 +1,6 @@
 import axios from 'axios'
-const ip = "100.24.63.94"
+const ip = "52.90.68.191"
+{/* para la IP LOCAL poner 192.168.1.203:5000 */}
 
 export default {
     login: user => {

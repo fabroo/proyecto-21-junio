@@ -6,8 +6,9 @@ export default class Lab extends Component {
   }
 
   async componentDidMount() {
+{/* para la IP LOCAL poner 192.168.1.203:5000 */}
 
-    axios.get('http://100.24.63.94/user/imagen').then(res => {
+    axios.get('http://52.90.68.191/user/imagen').then(res => {
 //console.log(res)
         } 
      )
