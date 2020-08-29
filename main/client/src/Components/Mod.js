@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
-
+import {Link} from 'react-router-dom'
 const Admin = props => {
     const [search, setSearch] = useState("");
     let [elinput, setElInput] = useState({ dni: 0, comapnyid: "", role: "user", username: "" })
-    let [loading, isLoading] = useState(false)
-
+    let [loading, isLoading] =  useState(false)
+    let [viewmore, setViewmore] = useState({display:'block'})
     const handleInput = e => {
         setSearch(e.target.value);
     };
@@ -29,14 +29,13 @@ const Admin = props => {
                     if (a.companyID > b.companyID) { return 1; }
                     return 0;
                 })
-                setContenido(contendio);
-
+                setContenido(contendio.slice(0,7));
                 isLoading(false)
             }, [])
         }
         showw()
     }, []);
-
+   
     const searchh = (e) => {
         if (content) {
             e.preventDefault();
@@ -99,7 +98,7 @@ const Admin = props => {
                 if (a.companyID > b.companyID) { return 1; }
                 return 0;
             }));
-
+            setViewmore({display:"none"});
         }, [])
     }
 
@@ -167,41 +166,45 @@ const Admin = props => {
             </div>
             {!loading ? (
                 <div>
-                    {contenido ? (
-                        contenido.map(user =>
-                            <table className="table table-hover text-center table-responsive-lg">
-                                <thead className="thead-dark">
-                                    <tr>
-                                        <th className="">Nombre</th>
-                                        <th className="">DNI</th>
-                                        <th className="">E-Mail</th>
-                                        <th className="">Modelo Entrenado?</th>
-                                        <th className="">Profile Picture</th>
-                                        <th className="">Rol</th>
-                                        <th>Comp. ID</th>
-                                        <th className="">Cantidad de Fotos</th>
-                                        <th>Eliminar</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
 
+                    <table className="table table-hover text-center table-responsive-lg">
+                        <thead className="thead-dark">
+                            <tr>
+
+                                <th className="">Nombre</th>
+                                <th className="">DNI</th>
+                                <th className="">E-Mail</th>
+                                <th className="">Modelo Entrenado?</th>
+                                <th className="">Profile Picture</th>
+                                <th className="">Rol</th>
+                                <th>Comp. ID</th>
+                                <th className="">Cantidad de Fotos</th>
+                                <th>Eliminar</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {contenido ? (
+                                contenido.map(user =>
                                     <tr key={user._id}>
                                         <td>{!user.createdAccount ? (<p>No registrado</p>) : (<p>{user.username}</p>)}</td>
                                         <td ><p>{user.dni}</p></td>
                                         <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>) : (<p>no creada</p>)}</td>
                                         <td> {user.createdAccount ? (!user.modeloEntrenado ? <p>no</p> : <p>si</p>) : (<p>no creada</p>)}</td>
-                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://52.90.68.191\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no creada</p>)}</td>
-{/* para la IP LOCAL poner 192.168.1.203:5000 */}
-                                        
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px' }} src={'http://localhost:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no creada</p>)}</td>
+                                        {/* para la IP LOCAL poner 192.168.1.203:5000 */}
+
                                         <td><p>{user.role}</p></td>
                                         <td><p>{user.companyID}</p></td>
                                         <td><p >{user.createdAccount ? (user.cantidadFotos) : (<p>no creada</p>)}</p></td>
                                         <td> {user.role !== "mod" ? (<button className="btn btn-danger" onClick={() => chau(user._id)} >X</button>) : (<p>es mod bro</p>)} </td>
                                     </tr>
-                                </tbody>
-                            </table>
-                        )
-                    ) : (<tr><td>No content...</td></tr>)}
+
+                                )
+                            ) : (<tr><td>No content...</td></tr>)}
+                        </tbody>
+                    </table>
+                    <p style = {viewmore}onClick={() =>showData()} >View All</p>
                 </div>
             ) : (<h1>loading</h1>)}
             <br />

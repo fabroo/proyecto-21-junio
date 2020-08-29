@@ -183,11 +183,10 @@ const Admin = props => {
 
     return (
         <div className="container" >
-            <h1 className="display-4 m-4 text-center">Código: "{user.companyID}"</h1>
-            <a href={"http://52.90.68.191/user/download/" + user.companyID} className="display-4  text-center"><h2>Dowload</h2></a>
-{/* para la IP LOCAL poner 192.168.1.203:5000 */}
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
+                <button className="btn btn-info m-2" ><a style={{color:'white'}} href={"http://localhost:5000/user/download/" + user.companyID}>DOWNLOAD DATA</a></button>
+
                     <button className="btn btn-primary m-2 none" style={registradoClass} onClick={() => showWich(true)}>REGISTRADOS</button>
                     <button className="btn btn-secondary m-2 none" style={noregistradoClass} onClick={() => showWich(false)}>NO REGISTRADOS</button>
                     <button type="button" className="btn btn-info m-2" data-toggle="modal" data-target="#exampleModalCenter"> +</button>
@@ -249,8 +248,8 @@ const Admin = props => {
                                         <td ><p>{user.dni}</p></td>
                                         <td>{user.createdAccount ? (<p><a rel="noopener noreferrer" href={"https://mail.google.com/mail/u/0/?view=cm&fs=1&to=" + user.mail + "&tf=1"} target="_blank">{user.mail}</a></p>) : (<p>No creada</p>)}</td>
                                         <td> {!user.modeloEntrenado ? <p>no</p> : <p>si</p>}</td>
-                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px',height:'100px',objectFit:'cover' }} src={'http://52.90.68.191\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no hay :(</p>)}</td>
-{/* para la IP LOCAL poner 192.168.1.203:5000 */}
+                                        <td>{user.createdAccount ? <img className="img-fluid" style={{ width: '100px', height: '100px', objectFit: 'cover' }} src={'http://localhost:5000\\user\\pfp\\' + user.companyID + '\\' + user.dni} alt={user.username} /> : (<p>no hay :(</p>)}</td>
+                                        {/* para la IP LOCAL poner 192.168.1.203:5000 */}
 
                                         <td><p>{user.role}</p></td>
                                         <td><p onClick={() => wipeFotos(user)}>{user.cantidadFotos}</p></td>

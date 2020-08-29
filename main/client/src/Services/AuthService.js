@@ -1,5 +1,5 @@
 import axios from 'axios'
-const ip = "52.90.68.191"
+const ip = "localhost:5000"
 {/* para la IP LOCAL poner 192.168.1.203:5000 */}
 
 export default {
