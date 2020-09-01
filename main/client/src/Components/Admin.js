@@ -74,11 +74,14 @@ const Admin = props => {
                 }
             })
             //sort them
-            setContent(users.sort(function (a, b) {
-                if (a.username < b.username) { return -1; }
-                if (a.username > b.username) { return 1; }
-                return 0;
-            }));
+           
+                setContent(users.sort(function (a, b) {
+                    if (a.username < b.username) { return -1; }
+                    if (a.username > b.username) { return 1; }
+                    return 0;
+                }));
+          
+            
         }, [])
     }
     //delete users
@@ -185,7 +188,7 @@ const Admin = props => {
         <div className="container" >
             <div className="arriba d-flex flex-row-reverse">
                 <div className="botonera" style={{ display: 'flex' }} >
-                <button className="btn btn-info m-2" ><a style={{color:'white'}} href={"http://localhost:5000/user/download/" + user.companyID}>DOWNLOAD DATA</a></button>
+                <button className="btn btn-info m-2" ><a style={{color:'white'}} href={"http://localhost:5000/api/upload/download/" + user.companyID}>DOWNLOAD DATA</a></button>
 
                     <button className="btn btn-primary m-2 none" style={registradoClass} onClick={() => showWich(true)}>REGISTRADOS</button>
                     <button className="btn btn-secondary m-2 none" style={noregistradoClass} onClick={() => showWich(false)}>NO REGISTRADOS</button>

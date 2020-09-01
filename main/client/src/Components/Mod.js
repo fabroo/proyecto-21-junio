@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import AuthService from '../Services/AuthService';
 import swal from 'sweetalert';
-import {Link} from 'react-router-dom'
+
 const Admin = props => {
     const [search, setSearch] = useState("");
     let [elinput, setElInput] = useState({ dni: 0, comapnyid: "", role: "user", username: "" })
-    let [loading, isLoading] =  useState(false)
-    let [viewmore, setViewmore] = useState({display:'block'})
+    let [loading, isLoading] = useState(false)
+    let [viewmore, setViewmore] = useState({ display: 'block' })
     const handleInput = e => {
         setSearch(e.target.value);
     };
@@ -29,13 +29,13 @@ const Admin = props => {
                     if (a.companyID > b.companyID) { return 1; }
                     return 0;
                 })
-                setContenido(contendio.slice(0,7));
+                setContenido(contendio.slice(0, 7));
                 isLoading(false)
             }, [])
         }
         showw()
     }, []);
-   
+
     const searchh = (e) => {
         if (content) {
             e.preventDefault();
@@ -98,7 +98,7 @@ const Admin = props => {
                 if (a.companyID > b.companyID) { return 1; }
                 return 0;
             }));
-            setViewmore({display:"none"});
+            setViewmore({ display: "none" });
         }, [])
     }
 
@@ -204,7 +204,7 @@ const Admin = props => {
                             ) : (<tr><td>No content...</td></tr>)}
                         </tbody>
                     </table>
-                    <p style = {viewmore}onClick={() =>showData()} >View All</p>
+                    <p style={viewmore} onClick={() => showData()} >View All</p>
                 </div>
             ) : (<h1>loading</h1>)}
             <br />

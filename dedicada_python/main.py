@@ -12,7 +12,7 @@ def get_data(companyid):
     try:
         print('emepando')
         request = requests.get(
-            f'http://localhost:5000/user/get_data/{companyid}')
+            f'http://localhost:5000/api/user/get_data/{companyid}')
         response = request.text
         names = json.loads(response)['names']
         names = np.array(names)

@@ -18,8 +18,10 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true, useCrea
     console.log('successfully connected to database');
 });
 const userRouter = require('./routes/User');
-app.use('/user', userRouter);
-app.use('/python', require('./routes/python'))
+const routerUpload = require('./routes/Photos');
+app.use('/api/user', userRouter);
+app.use('/api/upload',routerUpload);
+
 
 app.listen(5000, () => {
     console.log('express server started');

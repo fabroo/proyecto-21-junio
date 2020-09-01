@@ -61,14 +61,14 @@ const Navbar = props => {
                 {
                     user.role === "mod" ? (
                         <Link to="/mod" className="nav-item">
-                        <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
-                            MOD
+                            <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
+                                MOD
                 </li>
-                    </Link>
-                    ):null
+                        </Link>
+                    ) : null
                 }
                 <Link className=" nav-item " to="/upload" >
-                    
+
                     <li className=" nav-link" data-toggle="collapse" data-target="#navbarSupportedContent">
                         Upload
                     </li>

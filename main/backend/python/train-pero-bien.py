@@ -20,17 +20,12 @@ try:
     new_faces_array = []
     new_names_array = []
     NEW_FACES= f'./fotitos/{company}'
-<<<<<<< HEAD
 
     if not os.path.exists(NEW_FACES):
+        
+
         os.makedirs(NEW_FACES)
 
-=======
-    
-    if not os.path.exists(NEW_FACES):
-        os.makedirs(NEW_FACES)
-    
->>>>>>> 744f67f3d4db59ad96cc2bc576ad79c85a37ede5
     for i in range(len(known_names)):
         known_names[i].rstrip('\r\n')
     for name in os.listdir(NEW_FACES):

@@ -7,7 +7,7 @@ import swal from 'sweetalert';
 const Upload = props => {
     const [picture, setPicture] = useState(null);
     const { user } = useContext(AuthContext);
-    const [style, setStyle] = useState({  width: '0%' })
+    const [style, setStyle] = useState({ width: '0%' })
     const [porcentaje, setPorcentaje] = useState({ porcentaje: '0%' })
     const [fotos, setFotos] = useState({ cantidad: 0 })
 
@@ -38,16 +38,16 @@ const Upload = props => {
                         setStyle({ width: ((x + 1) / picture.length) * 100 + '%' })
                         setPorcentaje({ porcentaje: ((x + 1) / picture.length) * 100 + '%' })
                     }
-                    AuthService.upload(data, user.username,user.companyID,user.dni).then(res =>{
+                    AuthService.upload(data, user.username, user.companyID, user.dni).then(res => {
                         swal(res.data.message)
                     })
-                    
+
                     swal({
                         icon: 'success',
                         title: 'Nice',
                         text: "fotos subidas"
                     })
-                   
+
                 } else {
                     swal({
                         icon: 'error',
