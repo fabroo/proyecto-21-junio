@@ -19,7 +19,10 @@ try:
     kn.close()
     new_faces_array = []
     new_names_array = []
+    total = 0
+    error_count = 0
     NEW_FACES= f'./fotitos/{company}'
+    error_count = 0
 
     if not os.path.exists(NEW_FACES):
         
@@ -42,12 +45,9 @@ try:
                     os.mkdir(f'{dir_done}/{name}')
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{dir_done}/{name}')
             except:
-                dir_error = './error/'
-                if not os.path.exists(f'{dir_error}/{name}'):
-                    os.makedirs(f'{dir_error}/{name}')
-
-                shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{dir_error}/{name}/{filename}')
-                
+                error_count += 1
+                os.remove(f'{NEW_FACES}/{name}/{filename}')
+            total += 1
         
 
     arrayPrevio_names = np.array(known_names)
@@ -72,6 +72,9 @@ try:
         pass
     END = time.time()
 
-    print('Terminado en: '+str(int(END-START))+' segundos')
+    if error_count > 0:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \n{error_count} de {total} no pudieron ser procesadas, revisa que las fotos no esten movidas y se note la presencia de la cara..')
+    else:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \nse pudieron cargar la(s) {total} fotos!')
 except Exception as ex:
     print("Err: " + ex)

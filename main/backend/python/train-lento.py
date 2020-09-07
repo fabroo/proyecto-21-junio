@@ -12,7 +12,8 @@ try:
     dir_error = './error/'
     companyid = sys.argv[2]
     dir_known = './known/' + companyid
-
+    error_count = 0
+    total = 0
     START = time.time() #the code starts here
 
     for name in os.listdir(KNOWN_FACES_DIR):
@@ -29,10 +30,9 @@ try:
                     os.makedirs(f'{dir_known}/{name}')
                 shutil.move(f'{KNOWN_FACES_DIR}/{name}/{filename}',f'{dir_known}/{name}/{filename}')
             except:
-                if not os.path.exists(f'{dir_error}/{name}'):
-                    os.makedirs(f'{dir_error}/{name}')
-                shutil.move(f'{KNOWN_FACES_DIR}/{name}/{filename}',f'{dir_error}/{name}/{filename}')
-
+                os.remove(f'{KNOWN_FACES_DIR}/{name}/{filename}')
+                error_count += 1
+            total += 1
     if not os.path.exists(f'./pickles/{companyid}'):
         os.makedirs(f'./pickles/{companyid}')
     f = open(f'./pickles/{companyid}/known_faces','wb')
@@ -46,8 +46,10 @@ try:
 
     END = time.time() #the code ends here
     #total time
-    data ='Terminado en ' + str(int(END - START)) + ' segundos!'
-    print(data)
+    if error_count > 0:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \n{error_count} de {total} no pudieron ser procesadas, revisa que las fotos no esten movidas y se note la presencia de la cara..')
+    else:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \nse pudieron cargar todas las fotos!')
 except Exception as ex:
     print("Err: " + ex)
 

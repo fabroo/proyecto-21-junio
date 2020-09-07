@@ -28,13 +28,16 @@ try:
             if known_names[i] == DESIGNATED_NAME:
                 del known_names[i]
                 known_faces.pop(i)
-
-    f = open(f'./pickles/{companyid}/known_faces','wb')
-    n = open(f'./pickles/{companyid}/known_names','wb')
-    newFaces = pickle.dump(known_faces,f, pickle.HIGHEST_PROTOCOL)
-    newNames = pickle.dump(known_names,n, pickle.HIGHEST_PROTOCOL)
-    f.close()    
-    n.close()
+    if len(known_faces) == 0 and len(known_names) == 0:
+        os.remove(f'./pickles/{companyid}/known_faces')
+        os.remove(f'./pickles/{companyid}/known_names')
+    else:         
+        f = open(f'./pickles/{companyid}/known_faces','wb')
+        n = open(f'./pickles/{companyid}/known_names','wb')
+        newFaces = pickle.dump(known_faces,f, pickle.HIGHEST_PROTOCOL)
+        newNames = pickle.dump(known_names,n, pickle.HIGHEST_PROTOCOL)
+        f.close()    
+        n.close()
 
     end = time.time()
 

@@ -22,8 +22,11 @@ try:
     KNOWN_FACES_DIR = './known/'+company
     START = time.time()
     indiv_names = np.unique(known_names)
-
+    error_count = 0
     NEW_FACES= './fotitos/'+company
+    
+    total = 0
+
 
     original = 0
     orignal2 = 0
@@ -39,7 +42,9 @@ try:
                 original = len(new_array)
                 shutil.move(f'{NEW_FACES}/{name}/{filename}',f'{KNOWN_FACES_DIR}/{name}')
             except:
-                pass
+                os.remove(f'{NEW_FACES}/{name}/{filename}')
+                error_count += 1
+            total += 1
         # n encodings nuevos
     pingo = False
     numPics = 0
@@ -70,7 +75,10 @@ try:
     n.close()
 
     END = time.time()
-    print('tardo ' + str(int(END - START)+2) + ' segundos (aprox uwu) checkpoint1: ' + str(hol1) + " checkpoint 2: " +str(known_names))
+    if error_count > 0:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \n{error_count} de {total} no pudieron ser procesadas, revisa que las fotos no esten movidas y se note la presencia de la cara..')
+    else:
+        print(f'tardo { str(int(END - START)+2) } segundos aproximadamente, \nse pudieron cargar todas las fotos!')
 
 except Exception as err:
     print(err)
