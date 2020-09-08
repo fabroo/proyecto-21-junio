@@ -13,71 +13,21 @@ userRouter.get('/hola', (req, res) => {
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const companyid = req.body.companyid
-    let path = 'fotitos/' + companyid + '/' + dni
-    const user = await UserNew.findOne({ dni: dni })
-    var modelo = user.modeloEntrenado;
-    if (!modelo) {
-        const deleteFolderRecursive = async function (path) {
-            if (fs.existsSync(path)) {
-
-                fs.readdirSync(path).forEach((file, index) => {
-
-                    const curPath = Path.join(path, file);
-
-                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                        deleteFolderRecursive(curPath);
-                    } else { // delete file
-                        fs.unlinkSync(curPath);
-                    }
-                });
-                await UserNew.findOne({ dni: dni }, function (err, doc) {
-                    if (err) return false;
-
-                    doc.cantidadFotos = 0;
-                    doc.save()
-
-                })
-                res.json({ message: 'todo ok', messageError: false })
-
-                fs.rmdirSync(path);
-            } else {
-                res.json({ message: 'ENOENT no existe eso', messageError: true })
-            }
-        };
-        deleteFolderRecursive(path);
-    } else {
-        var largeDataSet = []
-        const python = spawn('python', ['./python/delete.py', dni, companyid]);
-        await python.stdout.on('data', async (data) => {
-            largeDataSet.push(data);
-            var dataaaa = largeDataSet.join("")
-            res.json({ message: dataaaa })
-            if (!dataaaa.startsWith("Err")) {
-                var dni = req.params.dni;
-                await UserNew.findOne({ dni: dni }, function (err, doc) {
-                    if (err) return false;
-
-                    doc.cantidadFotos = 0;
-                    doc.modeloEntrenado = false;
-                    doc.save();
-                });
-            }
-        });
+    const user = await UserNew.findOne({ "dni": dni }) 
+    var faceIdArray = user.faceIds
+    var params = {
+        CollectionId: companyid,
+        FaceIds: faceIdArray
     }
-})
-userRouter.post('/addFotos/:dni', async (req, res) => {
-    const dni = req.params.dni;
-    const users = await UserNew.findOne({ "dni": dni })
-    await UserNew.findOne({ dni: dni }, function (err, doc) {
-        if (err) return false;
-
-        doc.cantidadFotos += req.body.cantidad;
+    AWSManager.deleteFaces(params)
+    await UserNew.findOne({dni:dni}, function (err,doc){
+        doc.modeloEntrenado = false
+        doc.faceIds = []
         doc.save()
-
     })
-    res.json({ message: { msgBody: "todo ok", msgError: false } })
-
+    
 })
+
 userRouter.post('/upload/:companyid/:dni', async function (req, res) {
     var params = {
 

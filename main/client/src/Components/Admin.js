@@ -133,7 +133,7 @@ const Admin = props => {
     const wipeFotos = async (user) => { //eliminar los datos del usuario en el pickle
         let dni = user.dni
         let companyID = user.companyID
-        if (user.cantidadFotos > 0 && user.createdAccount) {
+        if (user.modeloEntrenado && user.createdAccount) {
             swal("Estas seguro de ello? No podras volver atrás", {
                 buttons: {
                     cancel: "Cancelar",
