@@ -82,12 +82,13 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
     var params = {
 
     }
-
+    const direccion1 = 'fotitos/' + req.params.companyid;
+    const direccion2 = 'fotitos/' + req.params.companyid + '/' + req.params.dni;
     var storage = multer.diskStorage({
-
+        
         destination: function (req, file, cb) {
-            const direccion1 = 'fotitos/' + req.body.companyID;
-            const direccion2 = 'fotitos/' + req.body.companyID + '/' + req.body.username;
+            
+            
             var cr = false;
             var cro = false;
             if (!fs.existsSync(direccion1)) {
@@ -138,31 +139,20 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         } else if (err) {
             return res.status(500).json(err)
         }
-    })
-    var collections = AWSManager.listCollections(params)
-    if (!(req.body.companyID in collections)) {
-        AWSManager.createCollection({ CollectionId: req.body.companyID })
-        console.log("Aws creado")
-
-    }
-
-    fs.readdir(direccion2, (err, files) => {
-        files.forEach(file => {
-
-            var params = {
-                CollectionId: req.body.companyID, /* required */
-                Image: {
-                    Bytes: Buffer.from(file)
-                },
-                ExternalImageId: req.body.companyID + req.body.username,
-                MaxFaces: 1
-            };
+        fs.readdir(direccion2, (err, files) => {
+            var face_list = []
+            files.forEach(file =>{
+                var cntn = fs.readFileSync(direccion2 + '/' + file)
+                face_list.push(cntn)
+            })
+            AWSManager.listCollectionsAndAddFaces({}, {CollectionId:req.body.companyID}, face_list)
         })
     })
+    
 
     console.log("Fotos subidas")
 
-    await UserNew.findOne({ dni: dni }, function (error, doc) {
+    await UserNew.findOne({ dni: req.params.dni }, function (error, doc) {
         doc.modeloEntrenado = true;
         doc.save();
     })

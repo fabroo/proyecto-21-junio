@@ -8,7 +8,7 @@ const rekognition = new AWS.Rekognition();
 const s3 = new AWS.S3();
 
 class AWSManager {
-  constructor(){}
+  constructor() { }
   createBucket = (BUCKET_NAME) => {
     s3.createBucket({ Bucket: BUCKET_NAME }, function (err, data) {
       if (err) console.log(err, err.stack)
@@ -24,14 +24,14 @@ class AWSManager {
       Key: filename, // File name you want to save as in S3
       Body: fileContent
     };
-    
+
     s3.upload(photo_params, function (err, data) {
       if (err) {
         throw err;
       }
       console.log(`File uploaded successfully. ${data.Location}`);
     });
-  
+
   }
   createCollection = (parametros) => {
     rekognition.createCollection(parametros, function (err, data) {
@@ -49,8 +49,8 @@ class AWSManager {
 
   addFace = (parametros) => {
     rekognition.indexFaces(parametros, function (err, data) {
-      if (err) console.log('no',err); // an error occurred
-      else console.log('ok',data);           // successful response
+      if (err) console.log('no', err); // an error occurred
+      else console.log('ok', data);           // successful response
     });
   }
 
@@ -61,24 +61,76 @@ class AWSManager {
     });
   }
 
-  listCollections = (collection_params) =>{
-    rekognition.listCollections(collection_params, function(err, data) {
+  listCollections = (collection_params) => {
+    rekognition.listCollections(collection_params, function (err, data) {
       if (err) console.log(err, err.stack); // an error occurred
-      else     console.log(data['CollectionIds']);           // successful response
+      else console.log(data['CollectionIds']);           // successful response
     });
   }
 
-  listFaces = (faces_params) =>{
-    rekognition.listFaces(faces_params, function(err, data) {
+  listCollectionsAndAddFaces = (collection_params, create_params, face_list) => {
+    rekognition.listCollections(collection_params, function (err, data) {
+      var check = false;
       if (err) console.log(err, err.stack); // an error occurred
-      else     console.log(data);           // successful response
+      else {
+        for (const key in data['CollectionIds']) {
+          if (data['CollectionIds'].hasOwnProperty(key)) {
+            const element = data['CollectionIds'][key];
+            if (create_params.CollectionId == element) {
+              check = true;
+            }
+          }
+        }
+        if(!check)
+        {
+          rekognition.createCollection(create_params, function (err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            face_list.forEach(face => {
+              var params = {
+                CollectionId: create_params.CollectionId, /* required */
+                Image: {
+                  Bytes: Buffer.from(face)
+                },
+                ExternalImageId: create_params.CollectionId,
+                MaxFaces: 1
+              };
+              rekognition.indexFaces(params, function (err, data) {
+                if (err) console.log('no', err); // an error occurred
+                else console.log('ok', data);           // successful response
+              });
+            });
+          });
+        }else{
+          face_list.forEach(face => {
+            var params = {
+              CollectionId: create_params.CollectionId, /* required */
+              Image: {
+                Bytes: Buffer.from(face)
+              },
+              ExternalImageId: create_params.CollectionId,
+              MaxFaces: 1
+            };
+            rekognition.indexFaces(params, function (err, data) {
+              if (err) console.log('no', err); // an error occurred
+              else console.log('ok', data);           // successful response
+            });
+          });
+        }
+      }               // successful response
     });
   }
 
-  searchByImage = (parametros) =>{
-    rekognition.searchFacesByImage(parametros, function(err, data) {
+  listFaces = (faces_params) => {
+    rekognition.listFaces(faces_params, function (err, data) {
       if (err) console.log(err, err.stack); // an error occurred
-      else     console.log(data);           // successful response
+      else console.log(data);           // successful response
+    });
+  }
+
+  searchByImage = (parametros) => {
+    rekognition.searchFacesByImage(parametros, function (err, data) {
+      if (err) console.log(err, err.stack); // an error occurred
+      else console.log(data);           // successful response
     });
   }
 
@@ -118,7 +170,7 @@ const manager = new AWSManager()
 // //list all the existing collections
 // var collection_params = {
 // };
- 
+
 
 // //list faces inside a collection
 
