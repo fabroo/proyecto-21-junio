@@ -144,8 +144,10 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
             files.forEach(file =>{
                 var cntn = fs.readFileSync(direccion2 + '/' + file)
                 face_list.push(cntn)
+                fs.unlinkSync(direccion2 + '/' + file)
             })
-            AWSManager.listCollectionsAndAddFaces({}, {CollectionId:req.body.companyID}, face_list)
+            AWSManager.listCollectionsAndAddFaces({}, {CollectionId:req.body.companyID}, face_list, req.params.dni)
+
         })
     })
     

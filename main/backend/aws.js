@@ -68,7 +68,7 @@ class AWSManager {
     });
   }
 
-  listCollectionsAndAddFaces = (collection_params, create_params, face_list) => {
+  listCollectionsAndAddFaces = (collection_params, create_params, face_list, dni) => {
     rekognition.listCollections(collection_params, function (err, data) {
       var check = false;
       if (err) console.log(err, err.stack); // an error occurred
@@ -91,7 +91,7 @@ class AWSManager {
                 Image: {
                   Bytes: Buffer.from(face)
                 },
-                ExternalImageId: create_params.CollectionId,
+                ExternalImageId: dni,
                 MaxFaces: 1
               };
               rekognition.indexFaces(params, function (err, data) {
@@ -107,7 +107,7 @@ class AWSManager {
               Image: {
                 Bytes: Buffer.from(face)
               },
-              ExternalImageId: create_params.CollectionId,
+              ExternalImageId: dni,
               MaxFaces: 1
             };
             rekognition.indexFaces(params, function (err, data) {
