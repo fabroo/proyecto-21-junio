@@ -5,9 +5,9 @@ const multer = require('multer');
 const fs = require('fs');
 const Path = require('path');
 const { spawn } = require('child_process');
-
-userRouter.get('/hola' , (req,res) =>{
-    res.json({asdasd:"hollll"})
+const AWSManager = require('../aws');
+userRouter.get('/hola', (req, res) => {
+    res.json({ asdasd: "hollll" })
 })
 
 userRouter.post('/wipeFotos/:dni', async (req, res) => {
@@ -79,11 +79,16 @@ userRouter.post('/addFotos/:dni', async (req, res) => {
 
 })
 userRouter.post('/upload/:companyid/:dni', async function (req, res) {
-    var storage = multer.diskStorage({
+    var params = {
 
+    }
+    const direccion1 = 'fotitos/' + req.params.companyid;
+    const direccion2 = 'fotitos/' + req.params.companyid + '/' + req.params.dni;
+    var storage = multer.diskStorage({
+        
         destination: function (req, file, cb) {
-            const direccion1 = 'fotitos/' + req.body.companyID;
-            const direccion2 = 'fotitos/' + req.body.companyID + '/' + req.body.username;
+            
+            
             var cr = false;
             var cro = false;
             if (!fs.existsSync(direccion1)) {
@@ -134,164 +139,23 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
         } else if (err) {
             return res.status(500).json(err)
         }
+        fs.readdir(direccion2, (err, files) => {
+            var face_list = []
+            files.forEach(file =>{
+                var cntn = fs.readFileSync(direccion2 + '/' + file)
+                face_list.push(cntn)
+            })
+            AWSManager.listCollectionsAndAddFaces({}, {CollectionId:req.body.companyID}, face_list)
+        })
     })
-    var resultadoCheck = [];
-    var python = spawn('python', ['./python/check.py', req.params.companyid]);
-    console.log('antes')
-    await python.stdout.on('data', (data) => {
-        console.log('durante')
-        resultadoCheck.push(data);
-    });
+    
 
-    await python.stdout.on('close', async code => {
-        console.log('despues')
-        let yes = (resultadoCheck.join(""))
+    console.log("Fotos subidas")
 
-        if (yes.includes(String(req.params.dni))) {
-            var largeDataSet = [];
-            console.log("addnewPics")
-            python = spawn('python', ['./python/addExtraPics.py', req.params.dni, req.params.companyid])
-            
-            await python.stdout.on('data', (data) => {
-                console.log('adentro funco add pics')
-                largeDataSet.push(data);
-               res.json({ message: largeDataSet.join("") })
-            });
-
-            await python.stdout.on('close', async (code) => {
-                console.log('final')
-                var check_result = [];
-                var python = spawn('python', ['./python/check.py', req.params.companyid]);
-                var arr = [];
-                var arrFixed = []
-                console.log('antes')
-                await python.stdout.on('data', (data) => {
-                    console.log('durante')
-                    check_result.push(data);
-                });
-                await python.stdout.on('close', async code => {
-                    const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                    arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                    console.log('arr',arr)
-                    arr.forEach((user) => {
-                        var user1 = user.trim()
-                        var user2 = user1.slice(1, user1.length - 1)
-                        arrFixed.push((user2))
-                    })
-                    var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                    console.log("number of",numberOfOccurrencies)
-                    await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                        doc.cantidadFotos = numberOfOccurrencies;
-                        doc.save();
-                    });
-
-                })
-            });
-
-        }
-        else {
-            if (fs.existsSync('./pickles/' + req.params.companyid + '/known_names')) {
-                var largeDataSet = [];
-                console.log('train bien')
-                python = spawn('python', ['./python/train-pero-bien.py', req.params.companyid]);
-
-                await python.stdout.on('data', async (data) => {
-                    console.log('adentro funco train bien')
-                    largeDataSet.push(data);
-                    var fullData = largeDataSet.join("")
-                    res.json({ message: fullData })
-                    if (!fullData.startsWith("Err")) {
-                        //ACA YA SE AGREGAN NUEVAS COSAS AL PICKLE
-                        var dni = req.params.dni;
-                        console.log('adentro train bien')
-
-                        await UserNew.findOne({ dni: dni }, function (err, doc) {
-                            doc.modeloEntrenado = true;
-                            doc.save();
-                        });
-                    }
-
-                });
-                await python.stdout.on('close', async (code) => {
-                    console.log('final')
-                    var check_result = [];
-                    var python = spawn('python', ['./python/check.py', req.params.companyid]);
-                    var arr = [];
-                    var arrFixed = []
-                    console.log('antes')
-                    await python.stdout.on('data', (data) => {
-                        console.log('durante')
-                        check_result.push(data);
-                    });
-                    await python.stdout.on('close', async code => {
-                        console.log('adentro del close')
-                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                        arr.forEach((user) => {
-                            var user1 = user.trim()
-                            var user2 = user1.slice(1, user1.length - 1)
-                            arrFixed.push((user2))
-                        })
-                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                        console.log(numberOfOccurrencies)
-
-                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                            doc.cantidadFotos = numberOfOccurrencies;
-                            doc.save();
-                        });
-                        console.log('cambiado')
-                    })
-                });
-            } else {
-                var largeDataSet = [];
-                python = spawn('python', ['./python/train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
-                console.log('en el medio // train lento')
-                await python.stdout.on('data', async (data) => {
-                    console.log('adentro funco train lento')
-                    largeDataSet.push(data);
-                    var fullData = largeDataSet.join("")
-                    res.json({ message: largeDataSet.join("") })
-                    if (!fullData.startsWith("Err")) {
-                        //ACA SE AGREGAN NUEVAS COSAS AL PICKLE
-                        var dni = req.params.dni;
-                        await UserNew.findOne({ dni: dni }, function (err, doc) {
-                            doc.modeloEntrenado = true;
-                            doc.save();
-                        });
-                    }
-
-                });
-                await python.stdout.on('close', async (code) => {
-                    console.log('final')
-                    var check_result = [];
-                    var python = spawn('python', ['./python/check.py', req.params.companyid]);
-                    var arr = [];
-                    var arrFixed = []
-                    console.log('antes')
-                    await python.stdout.on('data', (data) => {
-                        console.log('durante')
-                        check_result.push(data);
-                    });
-                    await python.stdout.on('close', async code => {
-                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                        arr.forEach((user) => {
-                            var user1 = user.trim()
-                            var user2 = user1.slice(1, user1.length - 1)
-                            arrFixed.push((user2))
-                        })
-                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                            doc.cantidadFotos = numberOfOccurrencies;
-                            doc.save();
-                        });
-                    })
-                });
-            }
-        }
-
+    await UserNew.findOne({ dni: req.params.dni }, function (error, doc) {
+        doc.modeloEntrenado = true;
+        doc.save();
     })
-
 
 });
 userRouter.post('/uploadPfp', async function (req, res) {

@@ -8,6 +8,7 @@ const multer = require('multer');
 const fs = require('fs');
 const Path = require('path');
 const zip = require('express-zip');
+const AWSManager = require('../aws');
 const { spawn } = require('child_process');
 
 
@@ -75,13 +76,13 @@ userRouter.get('/delete/:_id', async (req, res) => {
     const users = await UserNew.deleteOne({ "_id": id })
     var dni = user.dni;
     var company = user.companyID;
-    const python = spawn('python', ['delete.py', dni, company])
-    var largeDataSet = []
-    await python.stdout.on('data', async (data) => {
-        largeDataSet.push(data);
-        var dataaaa = largeDataSet.join("")
-    });
-    return res.json(users)
+    // const python = spawn('python', ['delete.py', dni, company])
+    // var largeDataSet = []
+    // await python.stdout.on('data', async (data) => {
+    //     largeDataSet.push(data);
+    //     var dataaaa = largeDataSet.join("")
+    // });
+    // return res.json(users)
 })
 
 userRouter.get('/getFotos/:dni', async (req, res) => {
@@ -102,66 +103,66 @@ userRouter.get('/get_data/:companyid', async (req, res) => {
     let companyid = req.params.companyid
     var largeDataSet = [];
 
-    const python = spawn('python', ['pickle_to_text_faces.py', companyid]);
-    console.log('afuera')
+    // const python = spawn('python', ['pickle_to_text_faces.py', companyid]);
+    // console.log('afuera')
 
-    await python.stdout.on('data', async (data) => {
-        console.log('adentro faces')
-        largeDataSet.push(data);
+    // await python.stdout.on('data', async (data) => {
+    //     console.log('adentro faces')
+    //     largeDataSet.push(data);
 
-    });
-    await python.stdout.on('close', async code => {
-        let rawData = largeDataSet.join("")
-        let edited = rawData.slice(1, rawData.length - 3)
-        let porArray = edited.split('array')
-        let arrayDeEncodingss = []
+    // });
+    // await python.stdout.on('close', async code => {
+    //     let rawData = largeDataSet.join("")
+    //     let edited = rawData.slice(1, rawData.length - 3)
+    //     let porArray = edited.split('array')
+    //     let arrayDeEncodingss = []
 
-        porArray.forEach(encoding => {
-            if (encoding.length > 0) {
-                arrayDeEncodingss.push(encoding.trim())
-            }
-        })
-        let encoding_bien_format = []
-        arrayDeEncodingss.forEach(arraydeencoding => {
-            if (arraydeencoding[arraydeencoding.length - 1] == ',') {
-                let uwu = arraydeencoding.slice(1, arraydeencoding.length - 2)
+    //     porArray.forEach(encoding => {
+    //         if (encoding.length > 0) {
+    //             arrayDeEncodingss.push(encoding.trim())
+    //         }
+    //     })
+    //     let encoding_bien_format = []
+    //     arrayDeEncodingss.forEach(arraydeencoding => {
+    //         if (arraydeencoding[arraydeencoding.length - 1] == ',') {
+    //             let uwu = arraydeencoding.slice(1, arraydeencoding.length - 2)
 
-                encoding_bien_format.push(uwu.slice(2, uwu.length - 2))
-            } else {
-                encoding_bien_format.push(arraydeencoding.slice(2, arraydeencoding.length - 2))
+    //             encoding_bien_format.push(uwu.slice(2, uwu.length - 2))
+    //         } else {
+    //             encoding_bien_format.push(arraydeencoding.slice(2, arraydeencoding.length - 2))
 
-            }
-        })
-        let encodings_correctos = []
-        encoding_bien_format.forEach(encoding => {
-            let elArray = []
-            let numeros = encoding.split(',')
-            numeros.forEach(numero => {
-                elArray.push(parseFloat(numero.replace('\r\n', '').trim()))
+    //         }
+    //     })
+    //     let encodings_correctos = []
+    //     encoding_bien_format.forEach(encoding => {
+    //         let elArray = []
+    //         let numeros = encoding.split(',')
+    //         numeros.forEach(numero => {
+    //             elArray.push(parseFloat(numero.replace('\r\n', '').trim()))
 
-            })
-            encodings_correctos.push(elArray)
-        })
-        var laData = [];
+    //         })
+    //         encodings_correctos.push(elArray)
+    //     })
+    //     var laData = [];
 
-        const python1 = spawn('python', ['pickle_to_text_names.py', companyid]);
-        await python1.stdout.on('data', (data) => {
-            console.log('adentro names')
-            laData.push(data);
+    //     const python1 = spawn('python', ['pickle_to_text_names.py', companyid]);
+    //     await python1.stdout.on('data', (data) => {
+    //         console.log('adentro names')
+    //         laData.push(data);
 
-        });
-        await python1.stdout.on('close', async code => {
-            let rawData = laData.join("")
-            let edited = rawData.slice(1, rawData.length - 3)
-            let listed = edited.split(',')
-            let final = []
-            listed.forEach(dni => {
-                final.push(parseInt(dni.trim().slice(1, dni.length - 2)))
-            })
+    //     });
+    //     await python1.stdout.on('close', async code => {
+    //         let rawData = laData.join("")
+    //         let edited = rawData.slice(1, rawData.length - 3)
+    //         let listed = edited.split(',')
+    //         let final = []
+    //         listed.forEach(dni => {
+    //             final.push(parseInt(dni.trim().slice(1, dni.length - 2)))
+    //         })
 
-            return res.json({ names: final, faces: encodings_correctos })
-        })
-    })
+    //         return res.json({ names: final, faces: encodings_correctos })
+    //     })
+    // })
 
 })
 userRouter.get('/get_user_info/:companyid', async (req, res) => {
@@ -304,6 +305,10 @@ userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req
 
 
 userRouter.post('/upload/:companyid/:dni', async function (req, res) {
+    var params = {
+
+    }
+
     var storage = multer.diskStorage({
 
         destination: function (req, file, cb) {
@@ -360,162 +365,31 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
             return res.status(500).json(err)
         }
     })
-    var resultadoCheck = [];
-    var python = spawn('python', ['check.py', req.params.companyid]);
-    console.log('antes')
-    await python.stdout.on('data', (data) => {
-        console.log('durante')
-        resultadoCheck.push(data);
-    });
+    var collections = AWSManager.listCollections(params)
+    if (!(req.body.companyID in collections)) {
+        AWSManager.createCollection({ CollectionId: req.body.companyID })
+        console.log("Aws creado")
 
-    await python.stdout.on('close', async code => {
-        console.log('despues')
-        let yes = (resultadoCheck.join(""))
+    }
+    fs.readdir(direccion2, (err, files) => {
+        files.forEach(file => {
 
-        if (yes.includes(String(req.params.dni))) {
-            var largeDataSet = [];
-            console.log("addnewPics")
-            python = spawn('python', ['addExtraPics.py', req.params.dni, req.params.companyid])
-            
-            await python.stdout.on('data', (data) => {
-                console.log('adentro funco add pics')
-                largeDataSet.push(data);
-                res.json({ message: largeDataSet.join("") })
-            });
-
-            await python.stdout.on('close', async (code) => {
-                console.log('final')
-                var check_result = [];
-                var python = spawn('python', ['check.py', req.params.companyid]);
-                var arr = [];
-                var arrFixed = []
-                console.log('antes')
-                await python.stdout.on('data', (data) => {
-                    console.log('durante')
-                    check_result.push(data);
-                });
-                await python.stdout.on('close', async code => {
-                    const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                    arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                    console.log('arr',arr)
-                    arr.forEach((user) => {
-                        var user1 = user.trim()
-                        var user2 = user1.slice(1, user1.length - 1)
-                        arrFixed.push((user2))
-                    })
-                    var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                    await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                        doc.cantidadFotos = numberOfOccurrencies;
-                        doc.save();
-                    });
-
-                })
-            });
-
-        }
-        else {
-            if (fs.existsSync('./pickles/' + req.params.companyid + '/known_names')) {
-                var largeDataSet = [];
-                console.log('train bien')
-                python = spawn('python', ['train-pero-bien.py', req.params.companyid]);
-
-                await python.stdout.on('data', async (data) => {
-                    console.log('adentro funco train bien')
-                    largeDataSet.push(data);
-                    var fullData = largeDataSet.join("")
-                    res.json({ message: fullData })
-                    if (!fullData.startsWith("Err")) {
-                        //ACA YA SE AGREGAN NUEVAS COSAS AL PICKLE
-                        var dni = req.params.dni;
-                        console.log('adentro train bien')
-
-                        await UserNew.findOne({ dni: dni }, function (err, doc) {
-                            doc.modeloEntrenado = true;
-                            doc.save();
-                        });
-                    }
-
-                });
-                await python.stdout.on('close', async (code) => {
-                    console.log('final')
-                    var check_result = [];
-                    var python = spawn('python', ['check.py', req.params.companyid]);
-                    var arr = [];
-                    var arrFixed = []
-                    console.log('antes')
-                    await python.stdout.on('data', (data) => {
-                        console.log('durante')
-                        check_result.push(data);
-                    });
-                    await python.stdout.on('close', async code => {
-                        console.log('adentro del close')
-                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                        arr.forEach((user) => {
-                            var user1 = user.trim()
-                            var user2 = user1.slice(1, user1.length - 1)
-                            arrFixed.push((user2))
-                        })
-                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                        console.log(numberOfOccurrencies)
-
-                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                            doc.cantidadFotos = numberOfOccurrencies;
-                            doc.save();
-                        });
-                        console.log('cambiado')
-                    })
-                });
-            } else {
-                var largeDataSet = [];
-                python = spawn('python', ['train-lento.py', './fotitos/' + req.params.companyid, req.params.companyid]);
-                console.log('en el medio // train lento')
-                await python.stdout.on('data', async (data) => {
-                    console.log('adentro funco train lento')
-                    largeDataSet.push(data);
-                    var fullData = largeDataSet.join("")
-                    res.json({ message: largeDataSet.join("") })
-                    if (!fullData.startsWith("Err")) {
-                        //ACA SE AGREGAN NUEVAS COSAS AL PICKLE
-                        var dni = req.params.dni;
-                        await UserNew.findOne({ dni: dni }, function (err, doc) {
-                            doc.modeloEntrenado = true;
-                            doc.save();
-                        });
-                    }
-
-                });
-                await python.stdout.on('close', async (code) => {
-                    console.log('final')
-                    var check_result = [];
-                    var python = spawn('python', ['check.py', req.params.companyid]);
-                    var arr = [];
-                    var arrFixed = []
-                    console.log('antes')
-                    await python.stdout.on('data', (data) => {
-                        console.log('durante')
-                        check_result.push(data);
-                    });
-                    await python.stdout.on('close', async code => {
-                        const countOccurrences = (arr, val) => arr.reduce((a, v) => (v === val ? a + 1 : a), 0);
-                        arr = check_result.join("").slice(1, check_result.join("").length - 3).split(",")
-                        arr.forEach((user) => {
-                            var user1 = user.trim()
-                            var user2 = user1.slice(1, user1.length - 1)
-                            arrFixed.push((user2))
-                        })
-                        var numberOfOccurrencies = (countOccurrences(arrFixed, req.params.dni))
-                        await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
-                            doc.cantidadFotos = numberOfOccurrencies;
-                            doc.save();
-                        });
-                    })
-                });
-            }
-        }
-
+            var params = {
+                CollectionId: req.body.companyID, /* required */
+                Image: {
+                    Bytes: Buffer.from(file)
+                },
+                ExternalImageId: req.body.companyID + req.body.username,
+                MaxFaces: 1
+            };
+        })
     })
+    console.log("Fotos subidas")
 
+    await UserNew.findOne({ dni: dni }, function (error, doc) {
+        doc.modeloEntrenado = true;
+        doc.save();
+    })
 
 });
 userRouter.post('/uploadPfp', async function (req, res) {
