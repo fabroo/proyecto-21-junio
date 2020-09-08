@@ -18,6 +18,14 @@ userRouter.get('/tool', async (req, res) => {
     return res.json(users)
 })
 
+userRouter.get('/tool2/:dni', async(req,res) =>{
+    await UserNew.findOne({dni:req.params.dni}, function(err, doc){
+        doc.faceIds=[]
+        doc.save()
+    })
+    return res.json({messi:'messi'})
+})
+
 userRouter.get('/hola', async (req, res) => {
     return res.send('hola mundooo')
 })

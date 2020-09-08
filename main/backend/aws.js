@@ -1,7 +1,7 @@
 // Load the SDK and UUID
 const AWS = require('aws-sdk');
 const fs = require('fs')
-
+const UserNew = require('./models/User.js');
 AWS.config.update({ region: 'us-east-1' });
 
 const rekognition = new AWS.Rekognition();
@@ -69,6 +69,10 @@ class AWSManager {
   }
 
   listCollectionsAndAddFaces = (collection_params, create_params, face_list, dni) => {
+    var faceIdArray = []
+    function onlyUnique(value, index, self) { 
+      return self.indexOf(value) === index;
+    }
     rekognition.listCollections(collection_params, function (err, data) {
       var check = false;
       if (err) console.log(err, err.stack); // an error occurred
@@ -94,9 +98,24 @@ class AWSManager {
                 ExternalImageId: dni,
                 MaxFaces: 1
               };
-              rekognition.indexFaces(params, function (err, data) {
+              rekognition.indexFaces (params, async (err, data)=> {
                 if (err) console.log('no', err); // an error occurred
-                else console.log('ok', data);           // successful response
+                else{
+                  data['FaceRecords'].forEach(element =>{
+                    console.log(element['Face'].FaceId)
+                    faceIdArray.push(element['Face'].FaceId)
+                    
+                  })
+                  await UserNew.findOne({dni:dni}, function(err, doc){
+                    var actualArray = doc.faceIds
+                    for(var key in faceIdArray){
+                      actualArray.push(faceIdArray[key])
+                    }
+                    var finalArray = actualArray.filter(onlyUnique);
+                    doc.faceIds = finalArray
+                    doc.save()
+                  })
+                }          // successful response
               });
             });
           });
@@ -110,14 +129,30 @@ class AWSManager {
               ExternalImageId: dni,
               MaxFaces: 1
             };
-            rekognition.indexFaces(params, function (err, data) {
+            rekognition.indexFaces(params, async (err, data)=> {
               if (err) console.log('no', err); // an error occurred
-              else console.log('ok', data);           // successful response
+              else{
+                data['FaceRecords'].forEach(element =>{
+                  console.log(element['Face'].FaceId)
+
+                  faceIdArray.push(element['Face'].FaceId)
+                })
+                await UserNew.findOne({dni:dni}, function(err, doc){
+                  var actualArray = doc.faceIds
+                  console.log(faceIdArray)
+                  for(var key in faceIdArray){
+                    actualArray.push(faceIdArray[key])
+                  }
+                  doc.faceIds = actualArray
+                  doc.save()
+                })
+              }            // successful response
             });
           });
         }
       }               // successful response
     });
+   
   }
 
   listFaces = (faces_params) => {

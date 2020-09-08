@@ -34,7 +34,8 @@ const UserSchema = new mongoose.Schema({
     cantidadFotos: {
         type: Number,
         default: 0
-    }
+    },
+    faceIds:[String]
 });
 
 UserSchema.pre('save', function (next) {
