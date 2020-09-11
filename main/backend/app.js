@@ -21,8 +21,10 @@ mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true, useCrea
 });
 const userRouter = require('./routes/User');
 const routerUpload = require('./routes/Photos');
+const routerQR = require('./routes/qr');
 app.use('/api/user', userRouter);
 app.use('/api/upload',routerUpload);
+app.use('/api/qr',routerQR);
 
 
 app.listen(5000, () => {

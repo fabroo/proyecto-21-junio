@@ -11,19 +11,48 @@ const zip = require('express-zip');
 const AWSManager = require('../aws');
 const { spawn } = require('child_process');
 
-
+function makeid(length) {
+    var result = '';
+    var characters = 'ABJKLMNOPQRSIabcdefTUV!#$%&/WXgklmnopqrs89tuvw23456xyzhiYZCDEFGHj017';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    if (!validatePin(result)) {
+        makeid(length)
+    }
+    else {
+        return result;
+    }
+}
+async function validatePin(qrPin) {
+    const users_with_pin = await UserNew.findOne({ qrPin });
+    if (users_with_pin.length > 0) {
+        return false
+    }
+    return true
+}
 
 userRouter.get('/tool', async (req, res) => {
     const users = await UserNew.find()
     return res.json(users)
 })
+userRouter.get('/regenerate', async (req, res) => {
+    const users = await UserNew.find({})
+    users.forEach(async user => {
+        const pin = makeid(25)
+        await UserNew.update({ dni: user.dni }, { qrPin: pin })
+    })
 
-userRouter.get('/tool2/:dni', async(req,res) =>{
-    await UserNew.findOne({dni:req.params.dni}, function(err, doc){
-        doc.faceIds=[]
+    return res.json(await UserNew.find())
+})
+
+userRouter.get('/tool2/:dni', async (req, res) => {
+    await UserNew.findOne({ dni: req.params.dni }, function (err, doc) {
+        doc.faceIds = []
         doc.save()
     })
-    return res.json({messi:'messi'})
+    return res.json({ messi: 'messi' })
 })
 
 userRouter.get('/hola', async (req, res) => {
@@ -44,7 +73,7 @@ userRouter.get('/pfp/:companyid/:dni', async (req, res) => {
             return res.sendFile(`\\users\\${companyid}\\${dni}\\${dni}.png`, { root: '.' })
         })
     }
-    catch{
+    catch {
         fs.access(`.\\users\\${companyid}\\${dni}.jpg`, fs.F_OK, (err) => {
             return res.sendFile(`\\users\\${companyid}\\${dni}.jpg`, { root: '.' })
         })
@@ -272,12 +301,16 @@ userRouter.put('/register', async (req, res) => {
         await UserNew.findOne({ dni: dni }, async function (err, doc) {
             if (err) return false;
 
+            const qrPin = makeid(25)
+
+
             const users = await UserNew.find({ username: username })
             if (users.length === 0) {
                 doc.password = password;
                 doc.username = username;
                 doc.mail = mail;
                 doc.createdAccount = true;
+                doc.qrPin = qrPin;
                 doc.save()
             } else {
                 res.json({ message: { msgBody: "username taken", msgError: true } })
@@ -285,8 +318,14 @@ userRouter.put('/register', async (req, res) => {
             }
             res.json({ message: { msgBody: "cuenta reg", msgError: false } })
 
-        })
 
+            const python = spawn('python', ['qr_code.py', dni, companyID, qrPin])
+            var largeDataSet = []
+            await python.stdout.on('data', async (data) => {
+                largeDataSet.push(data);
+                var dataaaa = largeDataSet.join("")
+            });
+        })
 
     } else {
         res.json({ message: { msgBody: "hubo un error", msgError: true } });
