@@ -42,11 +42,7 @@ const Upload = props => {
                         swal(res.data.message)
                     })
 
-                    swal({
-                        icon: 'success',
-                        title: 'Nice',
-                        text: "fotos subidas"
-                    })
+                    
 
                 } else {
                     swal({

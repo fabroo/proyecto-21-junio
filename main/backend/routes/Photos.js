@@ -95,19 +95,10 @@ userRouter.post('/upload/:companyid/:dni', async function (req, res) {
                 face_list.push(cntn)
                 fs.unlinkSync(direccion2 + '/' + file)
             })
-            AWSManager.listCollectionsAndAddFaces({}, { CollectionId: req.body.companyID }, face_list, req.params.dni)
+            AWSManager.listCollectionsAndAddFaces({}, { CollectionId: req.body.companyID }, face_list, req.params.dni, res)
 
         })
     })
-
-
-    console.log("Fotos subidas")
-
-    await UserNew.findOne({ dni: req.params.dni }, function (error, doc) {
-        doc.modeloEntrenado = true;
-        doc.save();
-    })
-
 });
 userRouter.post('/uploadPfp', async function (req, res) {
 
