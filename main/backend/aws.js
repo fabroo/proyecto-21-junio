@@ -70,7 +70,7 @@ class AWSManager {
 
   listCollectionsAndAddFaces = (collection_params, create_params, face_list, dni) => {
     var faceIdArray = []
-    function onlyUnique(value, index, self) { 
+    function onlyUnique(value, index, self) {
       return self.indexOf(value) === index;
     }
     rekognition.listCollections(collection_params, function (err, data) {
@@ -85,8 +85,7 @@ class AWSManager {
             }
           }
         }
-        if(!check)
-        {
+        if (!check) {
           rekognition.createCollection(create_params, function (err, data) {
             if (err) console.log(err, err.stack); // an error occurred
             face_list.forEach(face => {
@@ -98,17 +97,17 @@ class AWSManager {
                 ExternalImageId: dni,
                 MaxFaces: 1
               };
-              rekognition.indexFaces (params, async (err, data)=> {
+              rekognition.indexFaces(params, async (err, data) => {
                 if (err) console.log('no', err); // an error occurred
-                else{
-                  data['FaceRecords'].forEach(element =>{
+                else {
+                  data['FaceRecords'].forEach(element => {
                     console.log(element['Face'].FaceId)
                     faceIdArray.push(element['Face'].FaceId)
-                    
+
                   })
-                  await UserNew.findOne({dni:dni}, function(err, doc){
+                  await UserNew.findOne({ dni: dni }, function (err, doc) {
                     var actualArray = doc.faceIds
-                    for(var key in faceIdArray){
+                    for (var key in faceIdArray) {
                       actualArray.push(faceIdArray[key])
                     }
                     var finalArray = actualArray.filter(onlyUnique);
@@ -119,7 +118,7 @@ class AWSManager {
               });
             });
           });
-        }else{
+        } else {
           face_list.forEach(face => {
             var params = {
               CollectionId: create_params.CollectionId, /* required */
@@ -129,18 +128,18 @@ class AWSManager {
               ExternalImageId: dni,
               MaxFaces: 1
             };
-            rekognition.indexFaces(params, async (err, data)=> {
+            rekognition.indexFaces(params, async (err, data) => {
               if (err) console.log('no', err); // an error occurred
-              else{
-                data['FaceRecords'].forEach(element =>{
+              else {
+                data['FaceRecords'].forEach(element => {
                   console.log(element['Face'].FaceId)
 
                   faceIdArray.push(element['Face'].FaceId)
                 })
-                await UserNew.findOne({dni:dni}, function(err, doc){
+                await UserNew.findOne({ dni: dni }, function (err, doc) {
                   var actualArray = doc.faceIds
                   console.log(faceIdArray)
-                  for(var key in faceIdArray){
+                  for (var key in faceIdArray) {
                     actualArray.push(faceIdArray[key])
                   }
                   doc.faceIds = actualArray
@@ -152,7 +151,7 @@ class AWSManager {
         }
       }               // successful response
     });
-   
+
   }
 
   listFaces = (faces_params) => {

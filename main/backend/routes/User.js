@@ -4,11 +4,7 @@ const passport = require('passport');
 const passportConfig = require('../passport');
 const JWT = require('jsonwebtoken');
 const UserNew = require('../models/User');
-const multer = require('multer');
 const fs = require('fs');
-const Path = require('path');
-const zip = require('express-zip');
-const AWSManager = require('../aws');
 const { spawn } = require('child_process');
 
 function makeid(length) {
@@ -43,7 +39,6 @@ userRouter.get('/regenerate', async (req, res) => {
         const pin = makeid(25)
         await UserNew.update({ dni: user.dni }, { qrPin: pin })
     })
-
     return res.json(await UserNew.find())
 })
 
@@ -216,62 +211,6 @@ userRouter.get('/zip/:companyid', async (req, res) => {
     res.zip(lionelmessi);
 })
 
-userRouter.post('/wipeFotos/:dni', async (req, res) => {
-    const dni = req.params.dni;
-    const companyid = req.body.companyid
-    let path = 'fotitos/' + companyid + '/' + dni
-    const user = await UserNew.findOne({ dni: dni })
-    var modelo = user.modeloEntrenado;
-    if (!modelo) {
-        const deleteFolderRecursive = async function (path) {
-            if (fs.existsSync(path)) {
-
-                fs.readdirSync(path).forEach((file, index) => {
-
-                    const curPath = Path.join(path, file);
-
-                    if (fs.lstatSync(curPath).isDirectory()) { // recurse
-                        deleteFolderRecursive(curPath);
-                    } else { // delete file
-                        fs.unlinkSync(curPath);
-                    }
-                });
-                await UserNew.findOne({ dni: dni }, function (err, doc) {
-                    if (err) return false;
-
-                    doc.cantidadFotos = 0;
-                    doc.save()
-
-                })
-                res.json({ message: 'todo ok', messageError: false })
-
-                fs.rmdirSync(path);
-            } else {
-                res.json({ message: 'ENOENT no existe eso', messageError: true })
-            }
-        };
-        deleteFolderRecursive(path);
-    } else {
-        var largeDataSet = []
-        const python = spawn('python', ['delete.py', dni, companyid]);
-        await python.stdout.on('data', async (data) => {
-            largeDataSet.push(data);
-            var dataaaa = largeDataSet.join("")
-            res.json({ message: dataaaa })
-            if (!dataaaa.startsWith("Err")) {
-                var dni = req.params.dni;
-                await UserNew.findOne({ dni: dni }, function (err, doc) {
-                    if (err) return false;
-
-                    doc.cantidadFotos = 0;
-                    doc.modeloEntrenado = false;
-                    doc.save();
-                });
-            }
-        });
-    }
-})
-
 userRouter.post('/addFotos/:dni', async (req, res) => {
     const dni = req.params.dni;
     const users = await UserNew.findOne({ "dni": dni })
@@ -294,16 +233,10 @@ const signToken = userID => {
 userRouter.put('/register', async (req, res) => {
     const { username, password, dni, companyID, mail } = req.body;
     const user_ = await UserNew.find({ companyID: companyID, dni: dni, createdAccount: false })
-
-
     if (user_.length !== 0 && user_ !== []) {
-
         await UserNew.findOne({ dni: dni }, async function (err, doc) {
             if (err) return false;
-
             const qrPin = makeid(25)
-
-
             const users = await UserNew.find({ username: username })
             if (users.length === 0) {
                 doc.password = password;
@@ -314,11 +247,8 @@ userRouter.put('/register', async (req, res) => {
                 doc.save()
             } else {
                 res.json({ message: { msgBody: "username taken", msgError: true } })
-
             }
             res.json({ message: { msgBody: "cuenta reg", msgError: false } })
-
-
             const python = spawn('python', ['qr_code.py', dni, companyID, qrPin])
             var largeDataSet = []
             await python.stdout.on('data', async (data) => {
@@ -326,13 +256,10 @@ userRouter.put('/register', async (req, res) => {
                 var dataaaa = largeDataSet.join("")
             });
         })
-
     } else {
         res.json({ message: { msgBody: "hubo un error", msgError: true } });
     }
-
 });
-
 userRouter.post('/login', passport.authenticate('local', { session: false }), (req, res) => {
     if (req.isAuthenticated()) {
         const { _id, username, role, dni, companyID, mail, cantidadFotos } = req.user;
@@ -340,167 +267,12 @@ userRouter.post('/login', passport.authenticate('local', { session: false }), (r
 
         res.cookie('access_token', token, { httpOnly: true, sameSite: true });
         res.status(200).json({ isAuthenticated: true, user: { username, role, dni, companyID, mail, cantidadFotos } });
-
     }
-
 });
-
 userRouter.get('/logout', passport.authenticate('jwt', { session: false }), (req, res) => {
     res.clearCookie('access_token');
     res.json({ user: { username: "", role: "", dni: "", companyID: "", mail: "", cantidadFotos: 0 }, success: true });
 });
-
-
-userRouter.post('/upload/:companyid/:dni', async function (req, res) {
-    var params = {
-
-    }
-
-    var storage = multer.diskStorage({
-
-        destination: function (req, file, cb) {
-            const direccion1 = 'fotitos/' + req.body.companyID;
-            const direccion2 = 'fotitos/' + req.body.companyID + '/' + req.body.username;
-            var cr = false;
-            var cro = false;
-            if (!fs.existsSync(direccion1)) {
-                fs.mkdir(direccion1, err => {
-                    if (err) {
-                        console.log(err)
-                    }
-                })
-                cr = true;
-            }
-            else {
-                cr = true;
-            }
-            if (cr) {
-                if (!fs.existsSync(direccion2)) {
-                    fs.mkdir(direccion2, err => {
-                        if (err) {
-                            console.log(err)
-                        }
-                    })
-                    cro = true;
-                }
-                else {
-                    cro = true;
-                }
-                if (cro) {
-                    cb(null, direccion2)
-                }
-            }
-        },
-        filename: function (req, file, cb) {
-            var extArr = file.originalname;
-            let extensiones = ['.jpg', '.jpeg', '.png'];
-            var extension = '';
-            for (let i = 0; i < extensiones.length; i++) {
-
-                if (extArr.includes(extensiones[i])) {
-                    extension = extensiones[i]
-                }
-            }
-            cb(null, req.body.username + '-' + Date.now() + '.' + extension)
-        }
-    })
-    var upload = multer({ storage: storage }).array('file')
-    upload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            return res.status(500).json(err)
-        } else if (err) {
-            return res.status(500).json(err)
-        }
-    })
-    var collections = AWSManager.listCollections(params)
-    if (!(req.body.companyID in collections)) {
-        AWSManager.createCollection({ CollectionId: req.body.companyID })
-        console.log("Aws creado")
-
-    }
-    fs.readdir(direccion2, (err, files) => {
-        files.forEach(file => {
-
-            var params = {
-                CollectionId: req.body.companyID, /* required */
-                Image: {
-                    Bytes: Buffer.from(file)
-                },
-                ExternalImageId: req.body.companyID + req.body.username,
-                MaxFaces: 1
-            };
-        })
-    })
-    console.log("Fotos subidas")
-
-    await UserNew.findOne({ dni: dni }, function (error, doc) {
-        doc.modeloEntrenado = true;
-        doc.save();
-    })
-
-});
-userRouter.post('/uploadPfp', async function (req, res) {
-
-    var storage = multer.diskStorage({
-        destination: function (req, file, cb) {
-            const direccion1 = 'users/' + req.body.companyID;
-            const direccion2 = 'users/' + req.body.companyID + '/' + req.body.username;
-            var cr = false;
-            var cro = false;
-            if (!fs.existsSync(direccion1)) {
-                fs.mkdir(direccion1, err => {
-                    if (err) {
-                        console.log(err)
-                    }
-                })
-                cr = true;
-            }
-            else {
-                cr = true;
-            }
-            if (cr) {
-                if (!fs.existsSync(direccion2)) {
-                    fs.mkdir(direccion2, err => {
-                        if (err) {
-                            console.log(err)
-                        }
-                    })
-                    cro = true;
-                }
-                else {
-                    cro = true;
-                }
-                if (cro) {
-                    cb(null, direccion2)
-                }
-            }
-        },
-        filename: function (req, file, cb) {
-            var extArr = file.originalname;
-            let extensiones = ['.jpg', '.jpeg', '.png'];
-            var extension = '';
-            for (let i = 0; i < extensiones.length; i++) {
-                if (extArr.includes(extensiones[i])) {
-                    extension = extensiones[i]
-                }
-            }
-            cb(null, req.body.username + extension)
-        }
-    })
-    var upload = multer({ storage: storage }).array('file')
-    upload(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            return res.status(500).json(err)
-        } else if (err) {
-            return res.status(500).json(err)
-        }
-
-        return res.status(200).send(req.file)
-
-    })
-});
-
-
 
 userRouter.get('/authenticated', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { username, role, dni, companyID, mail, cantidadFotos } = req.user;
