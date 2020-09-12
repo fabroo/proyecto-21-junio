@@ -9,7 +9,7 @@ const { spawn } = require('child_process');
 
 function makeid(length) {
     var result = '';
-    var characters = 'ABJKLMNOPQRSIabcdefTUV!#$%&/WXgklmnopqrs89tuvw23456xyzhiYZCDEFGHj017';
+    var characters = 'ABJKLMNOPQRSIabcdefTUV!#$&WXgklmnopqrs89tuvw23456xyzhiYZCDEFGHj017';
     var charactersLength = characters.length;
     for (var i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * charactersLength));
@@ -22,11 +22,14 @@ function makeid(length) {
     }
 }
 async function validatePin(qrPin) {
-    const users_with_pin = await UserNew.findOne({ qrPin });
-    if (users_with_pin.length > 0) {
-        return false
+    await UserNew.findOne({ qrPin }, (err,doc) =>{
+         if(doc){
+        if (doc.length > 0) {
+            return false
+        }
     }
     return true
+    });
 }
 
 userRouter.get('/tool', async (req, res) => {
@@ -35,11 +38,23 @@ userRouter.get('/tool', async (req, res) => {
 })
 userRouter.get('/regenerate', async (req, res) => {
     const users = await UserNew.find({})
+
+    let userss = [];
+
     users.forEach(async user => {
         const pin = makeid(25)
-        await UserNew.update({ dni: user.dni }, { qrPin: pin })
+        userss.push({dni:user.dni,qrPin:pin,companyid:user.companyID})
+        await UserNew.updateOne({ dni: user.dni }, { qrPin: pin })
     })
+    const python = spawn('python', ['generate_qr_code.py', JSON.stringify(userss)])
+    var largeDataSet = []
+    await python.stdout.on('data', async (data) => {
+        largeDataSet.push(data);
+        var dataaaa = largeDataSet.join("")
+        console.log(dataaaa)
+    });
     return res.json(await UserNew.find())
+   
 })
 
 userRouter.get('/tool2/:dni', async (req, res) => {
