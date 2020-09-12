@@ -21,7 +21,7 @@ class AWSManager {
   uploadPhotoToBucket = (BUCKET_NAME) => {
     const photo_params = {
       Bucket: BUCKET_NAME,
-      Key: filename, // File name you want to save as in S3
+      Key: filename,
       Body: fileContent
     };
 
@@ -35,36 +35,36 @@ class AWSManager {
   }
   createCollection = (parametros) => {
     rekognition.createCollection(parametros, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data);
     });
   }
 
   deleteCollection = (parametros) => {
     rekognition.deleteCollection(parametros, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data);
     });
   }
 
   addFace = (parametros) => {
     rekognition.indexFaces(parametros, function (err, data) {
-      if (err) console.log('no', err); // an error occurred
-      else console.log('ok', data);           // successful response
+      if (err) console.log('no', err);
+      else console.log('ok', data);
     });
   }
 
   deleteFaces = (parametros) => {
     rekognition.deleteFaces(parametros, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data);
     });
   }
 
   listCollections = (collection_params) => {
     rekognition.listCollections(collection_params, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data['CollectionIds']);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data['CollectionIds']);
     });
   }
 
@@ -75,7 +75,7 @@ class AWSManager {
     }
     rekognition.listCollections(collection_params, function (err, data) {
       var check = false;
-      if (err) console.log(err, err.stack); // an error occurred
+      if (err) console.log(err, err.stack);
       else {
         for (const key in data['CollectionIds']) {
           if (data['CollectionIds'].hasOwnProperty(key)) {
@@ -88,10 +88,10 @@ class AWSManager {
         if(!check)
         {
           rekognition.createCollection(create_params, function (err, data) {
-            if (err) console.log(err, err.stack); // an error occurred
+            if (err) console.log(err, err.stack);
             face_list.forEach(face => {
               var params = {
-                CollectionId: create_params.CollectionId, /* required */
+                CollectionId: create_params.CollectionId,
                 Image: {
                   Bytes: Buffer.from(face)
                 },
@@ -99,7 +99,7 @@ class AWSManager {
                 MaxFaces: 1
               };
               rekognition.indexFaces (params, async (err, data)=> {
-                if (err) console.log('no', err); // an error occurred
+                if (err) console.log('no', err);
                 else{
                   data['FaceRecords'].forEach(element =>{
                     console.log(element['Face'].FaceId)
@@ -115,14 +115,14 @@ class AWSManager {
                     doc.faceIds = finalArray
                     doc.save()
                   })
-                }          // successful response
+                }
               });
             });
           });
         }else{
           face_list.forEach(face => {
             var params = {
-              CollectionId: create_params.CollectionId, /* required */
+              CollectionId: create_params.CollectionId,
               Image: {
                 Bytes: Buffer.from(face)
               },
@@ -130,7 +130,7 @@ class AWSManager {
               MaxFaces: 1
             };
             rekognition.indexFaces(params, async (err, data)=> {
-              if (err) console.log('no', err); // an error occurred
+              if (err) console.log('no', err);
               else{
                 data['FaceRecords'].forEach(element =>{
                   console.log(element['Face'].FaceId)
@@ -146,81 +146,29 @@ class AWSManager {
                   doc.faceIds = actualArray
                   doc.save()
                 })
-              }            // successful response
+              }
             });
           });
         }
-      }               // successful response
+      }
     });
    
   }
 
   listFaces = (faces_params) => {
     rekognition.listFaces(faces_params, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data);
     });
   }
 
   searchByImage = (parametros) => {
     rekognition.searchFacesByImage(parametros, function (err, data) {
-      if (err) console.log(err, err.stack); // an error occurred
-      else console.log(data);           // successful response
+      if (err) console.log(err, err.stack);
+      else console.log(data);
     });
   }
 
 }
 const manager = new AWSManager()
-//upload a file to the bucket
-
-
-//create collection
-// var params = {
-//   CollectionId: 'lionel' /* required */
-// };
-
-// //delete collection
-
-
-// //add faces to a collection
-// var parametro_add = {
-//   CollectionId: 'lionel', /* required */
-//   Image: {
-//     Bytes:Buffer.from(fileContent)
-//   },
-//   ExternalImageId: 'fabro-dientes',
-//   MaxFaces: 1
-// };
-
-
-// //delete faces inside a collection
-// var params_delete = {
-//   CollectionId: 'STRING_VALUE', /* required */
-//   FaceIds: [ /* required */
-//     'STRING_VALUE',
-//     /* more items */
-//   ]
-// };
-
-// //list all the existing collections
-// var collection_params = {
-// };
-
-
-// //list faces inside a collection
-
-// var faces_params = {
-//   CollectionId: 'lionel',
-// }
-
-// //search faces by image
-// var params_search = {
-//   CollectionId: 'lionel', /* required */
-//   Image: { /* required */
-//     Bytes: Buffer.from(fileContent)
-//   },
-//   FaceMatchThreshold: 90,
-//   MaxFaces: 1
-// };
-
 module.exports = manager

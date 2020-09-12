@@ -1,8 +1,6 @@
 const express = require('express');
 const userRouter = express.Router();
 const UserNew = require('../models/User');
-const fs = require('fs');
-const { spawn } = require('child_process');
 
 
 userRouter.get('/hola', (req, res) => {
